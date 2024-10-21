@@ -23,3 +23,4 @@ Note 2 : Vous êtres très fortement encouragés à ajouter des fonctionnalités
 ## Langage
 - JavaScript (NodeJS)
 - Framework ?
+- Version mobile responsive
