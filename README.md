@@ -22,5 +22,5 @@ Note 2 : Vous êtres très fortement encouragés à ajouter des fonctionnalités
 
 ## Langage
 - JavaScript (NodeJS)
-- Framework ?
+- Framework VueJS
 - Version mobile responsive
