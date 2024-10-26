@@ -1,7 +1,6 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const request = require('request');
 const path = require('path');
 // const axios = require('axios');
 var cors = require('cors');
@@ -56,6 +55,32 @@ io.on("connection", (socket) => {
     socket.on('get rooms', () => {
         io.to(socket.id).emit('list rooms', rooms);
     });
+
+    socket.on('set host', (player) => {
+        rooms.forEach(r => {
+            if (r.id === player.roomId) {
+                r.players.forEach(p => {
+                    if (p.host === true && p.socketId !== player.socketId) {
+                        p.host = false;
+                    }
+                    if (p.socketId === player.socketId && p.host !== true) {
+                        p.host = true;
+                        io.to(player.socketId).emit('new host', p.socketId);
+                        console.log(`[new host] - ${r.id} - ${player.username}`);
+                    }
+                })
+            }
+        });
+    });ZS
+
+    socket.on('exit room', () => {
+        exitRoom(socket.id);
+    });
+
+    socket.on('kick player', (socketId) => {
+        exitRoom(socketId);
+        io.to(socketId).emit('kicked', socketId);
+    });
 })
 
 function createRoom(player) {
@@ -72,3 +97,38 @@ function createRoom(player) {
 function roomId() {
     return Math.random().toString(36).substr(2, 9);
 }
+
+function exitRoom(socketId) {
+    let room = null;
+
+    rooms.forEach(r => {
+        r.players.forEach(p => {
+            if (p.socketId === socketId) {
+                if (r.players.length === 1) {
+                    room = r;
+                    rooms = rooms.filter(r => r !== room);
+                }
+                else {
+                    r.players = r.players.filter(player => player.socketId !== socketId);
+                    if (p.host) {
+                        const randomIndex = Math.floor(Math.random() * r.players.length);
+                        const randomPlayer = r.players[randomIndex];
+                        randomPlayer.host = true;
+                        io.to(randomPlayer.socketId).emit("new host", randomPlayer.socketId);
+                        console.log(`[new host] - ${r.id} - ${randomPlayer.username}`);
+                    }
+                }
+            }
+        })
+    })
+}
+
+// // Route to redirect to index.html
+app.get('/', (req, res) => {
+    res.redirect('index.html');
+});
+
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => {
+    console.log(`Serveur en cours d'exécution sur le port ${PORT}`);
+});

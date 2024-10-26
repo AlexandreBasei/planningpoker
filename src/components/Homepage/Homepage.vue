@@ -2,13 +2,11 @@
 <template>
     <form v-if="homepage == true" class="homepage-form">
         <div class="inputs-container">
-            <input type="text" class="textInput" :placeholder="$t('UTILISATEUR')" v-model="pseudo" maxlength="15">
+            <input type="text" class="textInput" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
 
-            <button v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">{{ $t('JOUER')
-                }}</button>
+            <button v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un salon</button>
             <div v-else v-for="room in rooms" :key="room.id">
-                <button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">{{ $t('REJOINDRE_PARTIE')
-                    }}</button>
+                <button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre le salon</button>
             </div>
         </div>
     </form>
@@ -105,7 +103,6 @@ export default defineComponent({
                 this.socket.emit('playerData', this.player);
 
                 this.homepage = false;
-                localStorage.setItem('homepage', JSON.stringify(this.homepage));
             } else {
                 alert("Vous devez entrer un pseudonyme !")
             }
