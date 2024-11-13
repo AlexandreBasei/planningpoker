@@ -65,6 +65,10 @@ io.on("connection", (socket) => {
         io.to(player.socketId).emit('receivePlayer', player);
     });
 
+    socket.on("send room options", (roomId, gameMode, roundTimer, debateTimer) => {
+        io.to(roomId).emit('receive room options', gameMode, roundTimer, debateTimer);
+    })
+
     socket.on('set host', (player) => {
         rooms.forEach(r => {
             if (r.id === player.roomId) {
@@ -104,7 +108,7 @@ function createRoom(player) {
 }
 
 function roomId() {
-    return Math.random().toString(36).substr(2, 9);
+    return Math.random().toString(36).substr(2, 4);
 }
 
 function exitRoom(socketId) {

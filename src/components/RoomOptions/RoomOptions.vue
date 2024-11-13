@@ -29,6 +29,7 @@
                     </div>
                 </div>
             </div>
+            <p>Code de la salle : {{ currentRoom }}</p>
             <button id="shareLink" :class="{ 'shareLink': copied }" @click="copyLink">
                 <!-- (`localhost:8080?room=${player.roomId}`) -->
                 {{ copied ? "Copié !" : "Copier l'url de la salle" }}
@@ -38,15 +39,28 @@
         </div>
 
         <section class="roomOptions" v-if="game == false">
+            <h3>Paramètres du salon</h3>
             <div v-if="player.host" class="personalization-section">
-                <h3>Je suis hôte</h3>
                 <label for="importJson">Importer un fichier json contenant les tâches à évaluer</label>
                 <input type="file" @change="importJson" accept=".json" id="importJson">
+
+                <h4>Mode de jeu</h4>
+                <button @click="sendRoomOptions(0)">Unanimité</button>
+                <button @click="sendRoomOptions(1)">Majorité absolue</button>
+
+                <h4>Paramètres de la partie</h4>
+
+                <label for="roundTimer">Durée des tours : {{ roundTimer ?? 0 }} secondes</label>
+                <input  name="roundTimer" type="range" value="1" min="0" max="120" v-model="roundTimer" @change="sendRoomOptions">
+
+
+                <label for="roundTimer">Durée des débats : {{ debateTimer ?? 0 }} secondes</label>
+                <input  name="debateTimer" type="range" value="1" min="0" max="240" v-model="debateTimer" @change="sendRoomOptions">
                 <button @click="startGame">Lancer la partie</button>
             </div>
 
             <div v-if="!player.host">
-                <h3>Je ne suis pas hôte</h3>
+                <p></p>
             </div>
         </section>
 
@@ -83,6 +97,7 @@ export default defineComponent({
             copied: false,
             tasks: [],
             game: false,
+            gameMode : 0,
             maxRounds: 5,
             currentRound: 0,
             // games: [
@@ -160,6 +175,12 @@ export default defineComponent({
             reader.readAsText(file);
 
         },
+
+        sendRoomOptions(mode = 0) {
+            this.gameMode = mode;
+            this.socket.emit('send room options', this.currentRoom, this.gameMode, this.roundTimer, this.debateTimer);
+        },
+
         beforeUnloadHandler() {
             if (!this.isKicked) {
                 // const confirmationMessage = "Êtes-vous sûr de vouloir quitter cette page ? Vous quitterez la partie en cours";

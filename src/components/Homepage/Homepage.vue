@@ -4,10 +4,16 @@
         <div class="inputs-container">
             <input type="text" class="textInput" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
 
-            <button v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un salon</button>
+            <button v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
+                salon</button>
             <div v-else v-for="room in rooms" :key="room.id">
                 <button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre le salon</button>
             </div>
+        </div>
+        <div class="inputs-container">
+            <input type="text" class="textInput" placeholder="Entrer le code de la salle" v-model="roomCode"
+                maxlength="4">
+            <button v-if="homepage === true && !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
         </div>
     </form>
 
@@ -42,6 +48,7 @@ export default defineComponent({
             homepage: true,
             rooms: [],
             pseudo: "",
+            roomCode: "",
             socket: io("http://localhost:4000"),
             player: {
                 host: false,
@@ -93,6 +100,22 @@ export default defineComponent({
             }
         },
 
+        joinRoomWithCode() {
+            if (this.pseudo && this.roomCode) {
+                this.rooms.forEach(room => {
+                    if (room.id == this.roomCode) {
+                        this.player.roomId = room.id;
+                        this.player.username = this.pseudo;
+                        this.player.socketId = this.socket.id ?? "";
+
+                        this.socket.emit('playerData', this.player);
+                        this.homepage = false;
+                        this.roomId = "";
+                    }
+                });
+            }
+        },
+
         //Gestion de la validation du formulaire du création de room
         handleSubmit() {
             if (this.pseudo) {
@@ -114,7 +137,7 @@ export default defineComponent({
         },
 
         //Gestion du bouton de retour en arrière
-        back(){
+        back() {
             window.location.search = '?room=';
         },
 
