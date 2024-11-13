@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 // const axios = require('axios');
 var cors = require('cors');
+const { log } = require('console');
 
 const app = express();
 const server = http.createServer(app);
@@ -18,7 +19,7 @@ const io = require("socket.io")(server, {
     }
 });
 
-const rooms = [];
+let rooms = [];
 
 io.on("connection", (socket) => {
     console.log(`[connection] ${socket.id}`);
@@ -56,6 +57,14 @@ io.on("connection", (socket) => {
         io.to(socket.id).emit('list rooms', rooms);
     });
 
+    socket.on('start game', (roomId, tasks) => {
+        io.to(roomId).emit('start game', tasks);
+    });
+
+    socket.on('sendPlayer', (player) => {
+        io.to(player.socketId).emit('receivePlayer', player);
+    });
+
     socket.on('set host', (player) => {
         rooms.forEach(r => {
             if (r.id === player.roomId) {
@@ -71,7 +80,7 @@ io.on("connection", (socket) => {
                 })
             }
         });
-    });ZS
+    });
 
     socket.on('exit room', () => {
         exitRoom(socket.id);

@@ -1,55 +1,72 @@
 <template>
-    <section class="playersList">
-        <h3>Joueurs</h3>
-        <div class="playersContainer" v-for="room in rooms" :key="room.id">
-            <div class="playerContainer" v-if="room.id === player.roomId">
-                <div v-for="rplayer in room.players" :key="rplayer.socketId"
-                    :class="{ currentPlayer: rplayer.socketId === player.socketId }">
+    <section>
+        <div class="playersList">
+            <h3>Joueurs</h3>
+            <div class="playersContainer" v-for="room in rooms" :key="room.id">
+                <div class="playerContainer" v-if="room.id === player.roomId">
+                    <div v-for="rplayer in room.players" :key="rplayer.socketId"
+                        :class="{ currentPlayer: rplayer.socketId === player.socketId }">
 
-                    <span class="pseudoPlayer">
-                        <span>{{ rplayer.username }}</span>
+                        <span class="pseudoPlayer">
+                            <span v-if="rplayer.host">👑</span><span>{{ rplayer.username }}</span>
 
-                        <button v-if="player.host && rplayer.socketId !== player.socketId"
-                            @click="displayHostMenu(rplayer.socketId)" class="hostMenuButton no-background no-hover">
-                            <svg width="10px" height="15px" xmlns="http://www.w3.org/2000/svg" fill="black"
-                                class="bi bi-three-dots-vertical">
-                                <path
-                                    d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                            </svg>
-                        </button>
-                    </span>
+                            <button v-if="player.host && rplayer.socketId !== player.socketId"
+                                @click="displayHostMenu(rplayer.socketId)"
+                                class="hostMenuButton no-background no-hover">
+                                <svg width="10px" height="15px" xmlns="http://www.w3.org/2000/svg" fill="black"
+                                    class="bi bi-three-dots-vertical">
+                                    <path
+                                        d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                                </svg>
+                            </button>
+                        </span>
 
-                    <div v-bind:id="rplayer.socketId" class="hostMenu no-background no-hover">
-                        <button class="no-background no-hover" @click="setHost(rplayer)">Nouvel hôte</button>
-                        <button class="no-background no-hover" style="color: red;"
-                            @click="kickPlayer(rplayer.socketId)">Éjecter le joueur</button>
+                        <div v-bind:id="rplayer.socketId" class="hostMenu no-background no-hover">
+                            <button class="no-background no-hover" @click="setHost(rplayer)">Nouvel hôte</button>
+                            <button class="no-background no-hover" style="color: red;"
+                                @click="kickPlayer(rplayer.socketId)">Éjecter le joueur</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <button id="shareLink" :class="{ 'shareLink': copied }" @click="copyLink">
-            <!-- (`localhost:8080?room=${player.roomId}`) -->
-            {{ copied ? "Copié !" : "Copier l'url de la salle" }}
-        </button>
+            <button id="shareLink" :class="{ 'shareLink': copied }" @click="copyLink">
+                <!-- (`localhost:8080?room=${player.roomId}`) -->
+                {{ copied ? "Copié !" : "Copier l'url de la salle" }}
+            </button>
+            <button @click="exitRoom" class="submitBtn">Quitter la salle</button>
 
+        </div>
+
+        <section class="roomOptions" v-if="game == false">
+            <div v-if="player.host" class="personalization-section">
+                <h3>Je suis hôte</h3>
+                <label for="importJson">Importer un fichier json contenant les tâches à évaluer</label>
+                <input type="file" @change="importJson" accept=".json" id="importJson">
+                <button @click="startGame">Lancer la partie</button>
+            </div>
+
+            <div v-if="!player.host">
+                <h3>Je ne suis pas hôte</h3>
+            </div>
+        </section>
+
+        <PokerGame v-else :socket="socket" :tasks="tasks"></PokerGame>
     </section>
+
 </template>
 
 <script>
 
 import { defineComponent } from 'vue';
 import 'socket.io-client';
+import PokerGame from '../PokerGame/PokerGame.vue';
 
 export default defineComponent({
     name: 'roomOptions',
     homepage: '',
-    // components: {
-    //     Kbnotes,
-    //     ProfilePicture,
-    //     WtsComponent,
-    //     ClassicoComponent,
-    //     InfosComponent
-    // },
+    components: {
+        PokerGame
+    },
 
     props: {
         socket: {
@@ -64,7 +81,8 @@ export default defineComponent({
             currentRoom: '',
             player: {},
             copied: false,
-            game: 0,
+            tasks: [],
+            game: false,
             maxRounds: 5,
             currentRound: 0,
             // games: [
@@ -73,11 +91,6 @@ export default defineComponent({
             //     { id: 3, name: "What's the situation ?", image: require("@/assets/svg/partinies/blingbling.svg") }
             // ],
             gamesChosen: [],
-            draggedGameId: null,
-            draggedIndex: null,
-            dots: '',
-            maxDots: 3,
-            interval: undefined,
             interRoundDuration: 5,
             isKicked: false,
         }
@@ -92,10 +105,19 @@ export default defineComponent({
     mounted() {
 
         this.updRooms();
-        
+
         this.socket.on('join room', (player) => {
             this.player = player;
             this.currentRoom = player.roomId;
+        });
+
+        this.socket.on('start game', (tasks) => {
+            if (!this.player.host) {
+                this.tasks = tasks;
+            }
+
+            this.game = true;
+            this.socket.emit('sendPlayer', this.player);
         });
 
         this.socket.on('new host', (newHostId) => {
@@ -113,14 +135,37 @@ export default defineComponent({
                 console.log('kicked');
             }
         });
+
+        window.addEventListener("beforeunload", this.beforeUnloadHandler);
     },
 
     methods: {
-        beforeUnloadHandler(event) {
+        startGame() {
+            if (this.tasks.length === 0) {
+                alert("Veuillez importer un fichier json contenant les tâches à évaluer");
+                return;
+            }
+            else {
+                this.socket.emit('start game', this.currentRoom, this.tasks);
+            }
+        },
+        importJson(event) { //Get the tasks from the json file
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                this.tasks = JSON.parse(e.target.result).tasks;
+            };
+
+            reader.readAsText(file);
+
+        },
+        beforeUnloadHandler() {
             if (!this.isKicked) {
-                const confirmationMessage = "Êtes-vous sûr de vouloir quitter cette page ? Vous quitterez la partie en cours";
-                (event || window.event).returnValue = confirmationMessage; // For IE and Firefox
-                return confirmationMessage; // For other browsers
+                // const confirmationMessage = "Êtes-vous sûr de vouloir quitter cette page ? Vous quitterez la partie en cours";
+                // (event || window.event).returnValue = confirmationMessage;
+                // return confirmationMessage;
+                this.socket.emit("exit room");
             }
         },
         updRooms() {
@@ -199,6 +244,16 @@ export default defineComponent({
             }
             return false;
         },
+        resetPlayer() {
+            this.player = {
+                host: false,
+                roomId: "",
+                username: "",
+                socketId: ""
+            };
+            this.currentRoom = "";
+            this.isKicked = false;
+        }
     }
 
 })
