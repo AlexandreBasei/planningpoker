@@ -44,23 +44,42 @@
                 <label for="importJson">Importer un fichier json contenant les tâches à évaluer</label>
                 <input type="file" @change="importJson" accept=".json" id="importJson">
 
-                <h4>Mode de jeu</h4>
-                <button @click="sendRoomOptions(0)">Unanimité</button>
-                <button @click="sendRoomOptions(1)">Majorité absolue</button>
+                <h4>Mode de jeu : {{ gameMode }}</h4>
+                <div>
+                    <button v-for="(mode, index) in gameModes" :key="index" @click="setGameMode(index)">{{ mode
+                        }}</button>
+                </div>
 
-                <h4>Paramètres de la partie</h4>
+                <div>
+                    <h4>Paramètres de la partie</h4>
 
-                <label for="roundTimer">Durée des tours : {{ roundTimer ?? 0 }} secondes</label>
-                <input  name="roundTimer" type="range" value="1" min="0" max="120" v-model="roundTimer" @change="sendRoomOptions">
+                    <label for="roundTimer">Durée des tours : {{ roundTimer === 0 ? "∞" : roundTimer }} secondes</label>
+                    <input name="roundTimer" type="range" value="1" min="0" max="120" v-model="roundTimer"
+                        @change="sendRoomOptions">
 
 
-                <label for="roundTimer">Durée des débats : {{ debateTimer ?? 0 }} secondes</label>
-                <input  name="debateTimer" type="range" value="1" min="0" max="240" v-model="debateTimer" @change="sendRoomOptions">
+                    <label for="roundTimer">Durée des débats : {{ debateTimer === 0 ? "∞" : debateTimer }} secondes</label>
+                    <input name="debateTimer" type="range" value="1" min="0" max="240" v-model="debateTimer"
+                        @change="sendRoomOptions">
+                </div>
+
                 <button @click="startGame">Lancer la partie</button>
             </div>
 
-            <div v-if="!player.host">
-                <p></p>
+            <div v-if="!player.host" class="personalization-section">
+                <p v-if="jsonImported">Fichier json importé</p>
+                <p v-else>Aucun fichier json importé</p>
+
+                <h4>Mode de jeu : {{ gameMode }}</h4>
+
+                <div>
+                    <h4>Paramètres de la partie</h4>
+
+                    <p>Durée des tours : {{ roundTimer === 0 ? "∞" : roundTimer }} secondes</p>
+
+                    <p>Durée des débats : {{ debateTimer === 0 ? "∞" : debateTimer }} secondes</p>
+                </div>
+
             </div>
         </section>
 
@@ -97,17 +116,14 @@ export default defineComponent({
             copied: false,
             tasks: [],
             game: false,
-            gameMode : 0,
-            maxRounds: 5,
+            gameModes: ["Unanimité", "Majorité absolue"],
+            gameMode: "",
+            roundTimer: 0,
+            debateTimer: 0,
             currentRound: 0,
-            // games: [
-            //     { id: 1, name: "Keyboard-notes", image: require("@/assets/svg/partinies/solar.svg") },
-            //     { id: 2, name: "Classico", image: require("@/assets/svg/partinies/vilo.svg") },
-            //     { id: 3, name: "What's the situation ?", image: require("@/assets/svg/partinies/blingbling.svg") }
-            // ],
-            gamesChosen: [],
             interRoundDuration: 5,
             isKicked: false,
+            jsonImported: false,
         }
     },
 
@@ -121,9 +137,21 @@ export default defineComponent({
 
         this.updRooms();
 
+        this.gameMode = this.gameModes[0];
+
         this.socket.on('join room', (player) => {
             this.player = player;
             this.currentRoom = player.roomId;
+        });
+
+        this.socket.on('receive room options', (roomOptions) => {
+            if (!this.player.host) {
+                this.gameMode = roomOptions.gameMode;
+                this.roundTimer = roomOptions.roundTimer;
+                this.debateTimer = roomOptions.debateTimer;
+                this.jsonImported = roomOptions.jsonImported;
+                console.log("RECUUU : ", roomOptions);
+            }
         });
 
         this.socket.on('start game', (tasks) => {
@@ -170,15 +198,21 @@ export default defineComponent({
 
             reader.onload = (e) => {
                 this.tasks = JSON.parse(e.target.result).tasks;
+                this.jsonImported = true;
+                this.sendRoomOptions();
             };
 
             reader.readAsText(file);
 
         },
 
-        sendRoomOptions(mode = 0) {
-            this.gameMode = mode;
-            this.socket.emit('send room options', this.currentRoom, this.gameMode, this.roundTimer, this.debateTimer);
+        sendRoomOptions() {
+            this.socket.emit('send room options', this.currentRoom, { gameMode: this.gameMode, roundTimer: this.roundTimer, debateTimer: this.debateTimer, jsonImported: this.jsonImported });
+        },
+
+        setGameMode(modeIndex) {
+            this.gameMode = this.gameModes[modeIndex];
+            this.sendRoomOptions();
         },
 
         beforeUnloadHandler() {

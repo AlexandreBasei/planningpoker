@@ -65,8 +65,8 @@ io.on("connection", (socket) => {
         io.to(player.socketId).emit('receivePlayer', player);
     });
 
-    socket.on("send room options", (roomId, gameMode, roundTimer, debateTimer) => {
-        io.to(roomId).emit('receive room options', gameMode, roundTimer, debateTimer);
+    socket.on("send room options", (roomId, roomOptions) => {
+        io.to(roomId).emit('receive room options', roomOptions);
     })
 
     socket.on('set host', (player) => {

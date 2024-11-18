@@ -3,7 +3,7 @@
 
     <section>
         <div v-for="(task, index) in tasks" :key="index">
-            <h2>{{ task.title }}</h2>
+            <h2>{{ task.nom }}</h2>
             <p>{{ task.description }}</p>
         </div>
     </section>
