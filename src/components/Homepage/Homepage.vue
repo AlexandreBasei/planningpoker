@@ -3,7 +3,7 @@
     <form v-if="homepage == true" class="homepage-form">
         <div class="inputs-container">
             <input type="text" class="textInput" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
-            <input type="text" class="textInput" placeholder="Entrer le nom de la salle" v-model="roomName" maxlength="15">
+            <input v-if="!roomId" type="text" class="textInput" placeholder="Entrer le nom de la salle" v-model="roomName" maxlength="15">
 
             <button v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
                 salon</button>
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="inputs-container">
-            <input type="text" class="textInput" placeholder="Entrer le code de la salle" v-model="roomCode"
+            <input v-if="!roomId" type="text" class="textInput" placeholder="Entrer le code de la salle" v-model="roomCode"
                 maxlength="4">
             <button v-if="homepage === true && !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
         </div>

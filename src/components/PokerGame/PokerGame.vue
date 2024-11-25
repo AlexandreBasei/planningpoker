@@ -1,10 +1,10 @@
 <template>
-    <h1>Jeu</h1>
-
     <section>
         <div v-for="(task, index) in tasks" :key="index">
-            <h2>{{ task.nom }}</h2>
-            <p>{{ task.description }}</p>
+            <div v-if="index == taskIndex">
+                <h2>Tâche {{ index +1 }} : {{ task.nom }}</h2>
+                <p>{{ task.description }}</p>
+            </div>
         </div>
     </section>
 </template>
