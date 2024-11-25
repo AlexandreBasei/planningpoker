@@ -85,7 +85,7 @@
             </div>
         </section>
 
-        <PokerGame v-else :socket="socket" :tasks="tasks"></PokerGame>
+        <PokerGame v-else :socket="socket" :tasks="tasks" :gameMode="gameMode" :roundTimer="roundTimer" :debateTimer="debateTimer"></PokerGame>
     </section>
 
 </template>

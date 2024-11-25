@@ -26,15 +26,24 @@ export default defineComponent({
             type: Array,
             required: true
         },
+        gameMode: {
+            type: String,
+            required: true
+        },
+        roundTimer: {
+            type: Number,
+            required: true
+        },
+        debateTimer: {
+            type: Number,
+            required: true
+        },
     },
 
     data() {
         return {
-            maxRounds: 5,
-            currentRound: 0,
-            gamesChosen: [],
-            interRoundDuration: 5,
             isKicked: false,
+            images: this.importAll(require.context('@/assets', false, /\.svg$/))
         }
     },
 
@@ -52,7 +61,9 @@ export default defineComponent({
     },
 
     methods: {
-        
+        importAll(r) {
+            return r.keys().map(r);
+        },
     }
 })
 </script>
