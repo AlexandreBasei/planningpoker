@@ -4,6 +4,8 @@
             <h3>Joueurs</h3>
             <div class="playersContainer" v-for="room in rooms" :key="room.id">
                 <div class="playerContainer" v-if="room.id === player.roomId">
+                    <h3>{{ room.roomName }}</h3>
+                    <h4>{{ room }}</h4>
                     <div v-for="rplayer in room.players" :key="rplayer.socketId"
                         :class="{ currentPlayer: rplayer.socketId === player.socketId }">
 
@@ -90,8 +92,8 @@
 
 <script>
 
-import { defineComponent } from 'vue';
 import 'socket.io-client';
+import { defineComponent } from 'vue';
 import PokerGame from '../PokerGame/PokerGame.vue';
 
 export default defineComponent({

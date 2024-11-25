@@ -3,6 +3,7 @@
     <form v-if="homepage == true" class="homepage-form">
         <div class="inputs-container">
             <input type="text" class="textInput" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+            <input type="text" class="textInput" placeholder="Entrer le nom de la salle" v-model="roomName" maxlength="15">
 
             <button v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
                 salon</button>
@@ -22,8 +23,8 @@
 
 <script>
 import io from 'socket.io-client';
-import roomOptions from '../RoomOptions/RoomOptions.vue';
 import { defineComponent } from 'vue';
+import roomOptions from '../RoomOptions/RoomOptions.vue';
 
 // interface Room {
 //     id: string;
@@ -47,6 +48,7 @@ export default defineComponent({
         return {
             homepage: true,
             rooms: [],
+            roomName: "",
             pseudo: "",
             roomCode: "",
             socket: io("http://localhost:4000"),
@@ -97,7 +99,7 @@ export default defineComponent({
                 this.player.roomId = room.id;
                 this.player.username = this.pseudo;
                 this.player.socketId = this.socket.id ?? "";
-
+                
                 this.socket.emit('playerData', this.player);
                 this.homepage = false;
                 this.roomId = "";
@@ -129,12 +131,12 @@ export default defineComponent({
          * @constructor
          */
         handleSubmit() {
-            if (this.pseudo) {
+            if (this.pseudo && this.roomName) {
                 this.player.host = true;
                 this.player.username = this.pseudo;
                 this.player.socketId = this.socket.id ?? "";
 
-                this.socket.emit('playerData', this.player);
+                this.socket.emit('playerData', this.player, this.roomName);
 
                 this.homepage = false;
             } else {

@@ -29,14 +29,14 @@ io.on("connection", (socket) => {
         rooms = newRooms;
     })
 
-    socket.on("playerData", (player) => {
-        console.log(`[playerData] ${player.username}`);
+    socket.on("playerData", (player, roomName) => {
+        console.log(`[playerData] ${player.username} - ${roomName}`);
 
         let room = null;
 
         if (player.roomId === "") {
-            room = createRoom(player);
-            console.log(`[create room ] - ${room.id} - ${player.username}`);
+            room = createRoom(player, roomName);
+            console.log(`[create room ] - ${room.id}- ${roomName} - ${player.username}`);
         }
         else {
             room = rooms.find(r => r.id === player.roomId);
@@ -102,8 +102,8 @@ io.on("connection", (socket) => {
  * @param {object} player - The player object
  * @return The generated room array
  */
-function createRoom(player) {
-    const room = { id: roomId(), players: [] };
+function createRoom(player, roomName) {
+    const room = { id: roomId(), roomName: roomName, players: [] };
 
     player.roomId = room.id;
 
