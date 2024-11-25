@@ -87,7 +87,11 @@ export default defineComponent({
             });
         },
 
-        //Gestion de l'entrée dans une room et stockage des informations du joueur dans son objet "player"
+        /**
+         * Room entry management and storage of player information in the player object
+         * @constructor
+         * @param {array} room the room array
+         */
         joinRoom(room) {
             if (this.pseudo) {
                 this.player.roomId = room.id;
@@ -100,6 +104,10 @@ export default defineComponent({
             }
         },
 
+        /**
+         * Room entry management with a room code and storage of player information in the player object
+         * @constructor
+         */
         joinRoomWithCode() {
             if (this.pseudo && this.roomCode) {
                 this.rooms.forEach(room => {
@@ -116,7 +124,10 @@ export default defineComponent({
             }
         },
 
-        //Gestion de la validation du formulaire du création de room
+        /**
+         * Room creation form validation management 
+         * @constructor
+         */
         handleSubmit() {
             if (this.pseudo) {
                 this.player.host = true;
@@ -131,12 +142,18 @@ export default defineComponent({
             }
         },
 
-        //Gestion du rechargement de la page pour supprimer le roomId de l'url
+        /**
+         * Page reload management to delete the roomId in the url
+         * @constructor
+         */
         reload() {
             window.location.search = '?room=';
         },
 
-        //Gestion du bouton de retour en arrière
+        /**
+         * Delete the roomId in the url
+         * @constructor
+         */
         back() {
             window.location.search = '?room=';
         },

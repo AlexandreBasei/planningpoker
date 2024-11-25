@@ -183,6 +183,10 @@ export default defineComponent({
     },
 
     methods: {
+        /**
+         * Game start button management (start game if a json was imported)
+         * @constructor
+         */
         startGame() {
             if (this.tasks.length === 0) {
                 alert("Veuillez importer un fichier json contenant les tâches à évaluer");
