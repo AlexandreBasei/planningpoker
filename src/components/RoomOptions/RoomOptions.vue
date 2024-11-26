@@ -84,7 +84,7 @@
             </div>
         </section>
 
-        <PokerGame v-else :socket="socket" :tasks="tasks" :gameMode="gameMode" :roundTimer="roundTimer" :debateTimer="debateTimer"></PokerGame>
+        <PokerGame v-else :socket="socket" :currentRoom="currentRoom" :tasks="tasks" :gameMode="gameMode" :maxRoundTimer="maxRoundTimer" :maxDebateTimer="maxDebateTimer"></PokerGame>
     </section>
 
 </template>
@@ -119,10 +119,8 @@ export default defineComponent({
             game: false,
             gameModes: ["Unanimité", "Majorité absolue"],
             gameMode: "",
-            roundTimer: 0,
-            debateTimer: 0,
-            currentRound: 0,
-            interRoundDuration: 5,
+            maxRoundTimer: 0,
+            maxDebateTimer: 0,
             isKicked: false,
             jsonImported: false,
         }
