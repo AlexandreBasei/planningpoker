@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section class="mainSection">
         <div class="playersList">
             <h3>Joueurs</h3>
             <div class="playersContainer" v-for="room in rooms" :key="room.id">

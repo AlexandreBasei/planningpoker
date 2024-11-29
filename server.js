@@ -70,17 +70,27 @@ io.on("connection", (socket) => {
         io.to(roomId).emit('receive room options', roomOptions);
     });
 
-    socket.on('sendCard', (roomId, card, player) => {
+    socket.on('sendCard', (roomId, card, player, playerID) => {
         rooms.forEach(r => {
             if (r.id === roomId) {
-                r.cards.push({card : card, player : player});
+                r.cards.push([card, player, playerID]);
 
                 if (r.cards.length === r.players.length) {
                     io.to(roomId).emit('allCardsSent', r.cards);
+                    log(`[allCardsSent] - ${r.cards}`);
                     r.cards = [];
                 }
             }
         });
+    });
+
+    socket.on("sendMsg", (roomId, msg, username) => {
+        io.to(roomId).emit('receiveMsg', msg, username);
+        log(`[sendMsg] - ${msg}`);
+    });
+
+    socket.on("endDebate", (roomId) => {
+        io.to(roomId).emit('skipDebate');
     });
 
     socket.on('set host', (player) => {

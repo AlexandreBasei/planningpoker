@@ -1,0 +1,19 @@
+/* src/components/PokerGame/test_pokergame.css */
+
+@keyframes flipCard {
+    0% {
+        transform: rotateY(0deg);
+    }
+    100% {
+        transform: rotateY(180deg);
+    }
+}
+
+.cardList > button > div.flipped {
+    animation: flipCard 0.6s forwards;
+}
+
+/* Test to ensure the card flips back when cardsOn is false */
+.cardList > button > div {
+    animation: flipCard 0.6s reverse forwards;
+}
