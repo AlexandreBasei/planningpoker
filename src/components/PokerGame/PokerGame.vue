@@ -40,7 +40,7 @@
                         <h3>Joueur {{ card[1] }}</h3>
                         <img alt="Carte" :src="require('@/assets/images/svg/cartes/cartes_' + card[0] + '.svg')">
                     </div>
-                    <button v-if="!maxDebateTimer" @click="skipDebate">Terminer le débat</button>
+                    <button v-if="!maxDebateTimer && player.host == true" @click="endDebate">Terminer le débat</button>
                 </div>
             </div>
         </div>
@@ -91,6 +91,7 @@ export default defineComponent({
             debateTimer: 0,
             debateOn: false,
             debatePermission: false,
+            endScreen : false,
             cardsOn: true,
             cardsImgList: ['0', '1', '2', '3', '5', '8', '13', '20', '40', '100', 'cafe', 'interro'],
             cards: [],
@@ -114,30 +115,31 @@ export default defineComponent({
         this.socket.on('allCardsSent', (cards) => {
             setTimeout(() => {
 
+                this.cards = cards;
+                this.debatePermission = false;
+
                 // Si toutes les cartes sont les mêmes
                 if (cards.every((val, i, arr) => val[0] === arr[0][0])) {
-                    this.cards = cards;
                     this.taskIndex++;
                     this.roundTimerStart();
                 } else {
-                    
+
+                    //On retire les cartes interro et café
+                    const sortedCards = cards
+                            .filter(card => card[0] !== 'interro' && card[0] !== 'cafe')
+                            .sort((a, b) => Number(a[0]) - Number(b[0]));
+
                     // Si une carte est différente
                     if (this.gameMode === 'Unanimité') {
                         this.cardsOn = false;
                         this.debateOn = true;
-                        this.cards = cards;
-
-                        const sortedCards = cards
-                            .filter(card => card[0] !== 'interro' && card[0] !== 'cafe')
-                            .sort((a, b) => Number(a[0]) - Number(b[0]));
-
 
                         const firstCard = sortedCards[0][0];
                         const lastCard = sortedCards[sortedCards.length - 1][0];
-                        
+
                         sortedCards.forEach(card => {
                             console.log(card[0], firstCard, lastCard);
-                            
+
                             if (sortedCards[0][2] == this.player.socketId || sortedCards[sortedCards.length - 1][2] == this.player.socketId || (card[0] == firstCard && card[2] == this.player.socketId) || (card[0] == lastCard && card[2] == this.player.socketId)) {
                                 this.debatePermission = true;
                             }
@@ -146,21 +148,39 @@ export default defineComponent({
                         this.debateTimerStart();
                     }
 
-                    if (this.gameMode === 'Majorité') {
-                        this.cardsOn = false;
-                        this.debateOn = true;
-                        this.cards = cards;
+                    if (this.gameMode === 'Majorité absolue') {
+                        console.log("MAJORITE ACTIVEEEE");
 
-                        const sortedCards = cards
-                            .filter(card => card[0] !== 'interro' && card[0] !== 'cafe')
-                            .sort((a, b) => Number(a[0]) - Number(b[0]));
+                        //Compter le nombre d'occurences de chaque carte dans le tableau
+                        const count = sortedCards.reduce((acc, card) => {
+                            acc[card[0]] = (acc[card[0]] || 0) + 1;
+                            return acc;
+                        }, {});
 
-                        const middleCard = sortedCards[Math.floor(sortedCards.length / 2)];
-                        console.log(middleCard);
+                        //Si une carte est égale à plus de 50% des votes, passer à la tâche suivante, sinon débat entre la plus petite carte et la plus grande
+                        const maxCard = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
+                        const maxCardCount = count[maxCard];
+                        console.log("MAX CARD COUNT", maxCardCount);
 
+                        if (maxCardCount > cards.length / 2) {
+                            this.taskIndex++;
+                            this.roundTimerStart();
+                        } else {
+                            this.cardsOn = false;
+                            this.debateOn = true;
 
-                        if (middleCard[1] == this.player.username) {
-                            this.debatePermission = true;
+                            const firstCard = sortedCards[0][0];
+                            const lastCard = sortedCards[sortedCards.length - 1][0];
+
+                            sortedCards.forEach(card => {
+                                console.log(card[0], firstCard, lastCard);
+
+                                if (sortedCards[0][2] == this.player.socketId || sortedCards[sortedCards.length - 1][2] == this.player.socketId || (card[0] == firstCard && card[2] == this.player.socketId) || (card[0] == lastCard && card[2] == this.player.socketId)) {
+                                    this.debatePermission = true;
+                                }
+                            });
+
+                            this.debateTimerStart();
                         }
                     }
                 }
@@ -175,7 +195,6 @@ export default defineComponent({
         this.socket.on('endDebate', () => {
             this.debateOn = false;
             this.cardsOn = true;
-            this.taskIndex++;
             this.chatList = [];
             this.roundTimerStart();
         });
@@ -185,13 +204,22 @@ export default defineComponent({
 
     methods: {
         roundTimerStart() {
-            this.roundTimer = this.maxRoundTimer;
-            let timer = setInterval(() => {
-                this.roundTimer--;
-                if (this.roundTimer <= 0) {
-                    clearInterval(timer);
-                }
-            }, 1000);
+            if (this.taskIndex >= this.tasks.length) {
+                this.endScreen = true;
+                setTimeout(() => {
+                    this.socket.emit('endGame', this.currentRoom);
+                    this.endScreen = false;
+                }, 5000);
+            }
+            else {
+                this.roundTimer = this.maxRoundTimer;
+                let timer = setInterval(() => {
+                    this.roundTimer--;
+                    if (this.roundTimer <= 0) {
+                        clearInterval(timer);
+                    }
+                }, 1000);
+            }
         },
 
         debateTimerStart() {
@@ -204,7 +232,7 @@ export default defineComponent({
             }, 1000);
         },
 
-        skipDebate() {
+        endDebate() {
             this.socket.emit('endDebate', this.currentRoom);
         },
 
@@ -216,8 +244,6 @@ export default defineComponent({
             const cards = document.querySelectorAll('.cardBtn');
 
             cards.forEach(card2 => {
-                console.log(card2.id, selectedCard.id);
-
                 if (card2.id !== selectedCard.id) {
                     card2.firstChild.classList.toggle('flipped');
                 }

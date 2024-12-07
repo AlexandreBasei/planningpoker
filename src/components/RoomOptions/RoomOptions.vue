@@ -162,6 +162,10 @@ export default defineComponent({
             this.socket.emit('sendPlayer', this.player);
         });
 
+        this.socket.on('endGame', () => {
+            this.game = false;
+        });
+
         this.socket.on('new host', (newHostId) => {
             console.log('This.player.socketId', this.player.socketId);
 

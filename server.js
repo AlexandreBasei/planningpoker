@@ -90,7 +90,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("endDebate", (roomId) => {
-        io.to(roomId).emit('skipDebate');
+        io.to(roomId).emit('endDebate');
+    });
+
+    socket.on("endGame", (roomId) => {
+        io.to(roomId).emit('endGame');
     });
 
     socket.on('set host', (player) => {
