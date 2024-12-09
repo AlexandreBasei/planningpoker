@@ -1,5 +1,5 @@
 <template>
-    <section class="gameBoard">
+    <section class="gameBoard" v-if="!endScreen">
         <h1>Mode de jeu : {{ gameMode }}</h1>
         <h1 v-if="maxRoundTimer && cardsOn">Temps restant : {{ roundTimer }}</h1>
         <h1 v-if="!maxRoundTimer && cardsOn">Temps restant : illimité</h1>
@@ -44,6 +44,15 @@
                 </div>
             </div>
         </div>
+    </section>
+
+    <section v-else class="endScreen">
+        <h2>Fin de la partie</h2>
+        <h3>La partie est terminée, merci d'avoir utilisé notre outil !</h3>
+
+        <button @click="exportResult">Exporter le résultat</button>
+        <button @click="restartBtn" v-if="player.host">Retourner au salon</button>
+        
     </section>
 </template>
 
@@ -96,6 +105,7 @@ export default defineComponent({
             cardsImgList: ['0', '1', '2', '3', '5', '8', '13', '20', '40', '100', 'cafe', 'interro'],
             cards: [],
             msgList: [],
+            resultJson : {}
         }
     },
 
@@ -120,6 +130,7 @@ export default defineComponent({
 
                 // Si toutes les cartes sont les mêmes
                 if (cards.every((val, i, arr) => val[0] === arr[0][0])) {
+                    this.resultJson[this.tasks[this.taskIndex].nom] = cards[0][0];
                     this.taskIndex++;
                     this.roundTimerStart();
                 } else {
@@ -149,7 +160,6 @@ export default defineComponent({
                     }
 
                     if (this.gameMode === 'Majorité absolue') {
-                        console.log("MAJORITE ACTIVEEEE");
 
                         //Compter le nombre d'occurences de chaque carte dans le tableau
                         const count = sortedCards.reduce((acc, card) => {
@@ -163,6 +173,7 @@ export default defineComponent({
                         console.log("MAX CARD COUNT", maxCardCount);
 
                         if (maxCardCount > cards.length / 2) {
+                            this.resultJson[this.tasks[this.taskIndex].nom] = maxCard;
                             this.taskIndex++;
                             this.roundTimerStart();
                         } else {
@@ -206,10 +217,6 @@ export default defineComponent({
         roundTimerStart() {
             if (this.taskIndex >= this.tasks.length) {
                 this.endScreen = true;
-                setTimeout(() => {
-                    this.socket.emit('endGame', this.currentRoom);
-                    this.endScreen = false;
-                }, 5000);
             }
             else {
                 this.roundTimer = this.maxRoundTimer;
@@ -258,7 +265,11 @@ export default defineComponent({
                 this.socket.emit('sendMsg', this.currentRoom, this.chatMsg, this.player.username);
                 this.chatMsg = '';
             }
-        }
+        },
+
+        restartBtn() {
+            this.socket.emit('endGame', this.currentRoom);
+        },
     }
 })
 </script>
