@@ -267,6 +267,16 @@ export default defineComponent({
             }
         },
 
+        exportResult() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.resultJson));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "result.json");
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        },
+
         restartBtn() {
             this.socket.emit('endGame', this.currentRoom);
         },
