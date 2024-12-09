@@ -15,7 +15,8 @@
             </div>
         </div>
         <div class="inputs-container">
-            <input type="text" class="textInput" placeholder="Entrer le code de la salle" v-model="roomCode"
+            <h2 id="join">Rejoindre un salon</h2>
+            <input type="text" class="textInput" id="codeSalle" placeholder="Entrer le code de la salle" v-model="roomCode"
                 maxlength="4">
             <button id="submitJoin" v-if="homepage === true && !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
         </div>

@@ -1,5 +1,5 @@
 body {
-    background: linear-gradient(90deg, rgba(255, 138, 0, 0.1), rgba(229, 46, 113, 0.1)); /* Dégradé très léger */
+    background: linear-gradient(90deg, rgba(255, 138, 0, 0.1), rgba(229, 46, 113, 0.1));
 }
 
 .textInput {
@@ -11,6 +11,7 @@ body {
     text-align: center;
     border-image: linear-gradient(90deg, #ff8a00, #e52e71) 1;
     padding: 15px 20px;
+    border-radius: 30px;
 }
 
 #pseudo {
@@ -47,26 +48,27 @@ body {
     transform: scale(1.1);
   }
 
-
-#join {
-    margin-left: 450px;
-    margin-top: 230px;
+  #join {
+    margin-left: 250px;
+    margin-top: 150px;
 }
 
 #creer {
-    margin-top: 230px;
     margin-left: 200px;
+    margin-top: 150px;
 }
-
 
 #submitJoin {
     margin-top: 75px;
-    margin-left: 730px;
+    margin-left: 550px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
 }
 
 #submitCreer {
-    margin-top: 75px;
-    margin-left: 525px;
+    margin-top: 50px;
+    margin-left: 450px;
 }
 
 h2 {
