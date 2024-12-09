@@ -1,20 +1,24 @@
 <!-- La "vue" de notre composant, partie visible par l'utilisateur (HTML) -->
 <template>
+    <link href="homepage.css" rel="stylesheet">
     <form v-if="homepage == true" class="homepage-form">
+        
         <div class="inputs-container">
-            <input type="text" class="textInput" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
-            <input type="text" class="textInput" placeholder="Entrer le nom de la salle" v-model="roomName" maxlength="15">
+            <h2 id="creer">Créer un salon</h2>
+            <input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+            <input type="text" class="textInput" id="nomSalle" placeholder="Entrer le nom de la salle" v-model="roomName" maxlength="15">
 
-            <button v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
+            <button id="submitCreer" v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
                 salon</button>
             <div v-else v-for="room in rooms" :key="room.id">
                 <button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre le salon</button>
             </div>
         </div>
         <div class="inputs-container">
-            <input type="text" class="textInput" placeholder="Entrer le code de la salle" v-model="roomCode"
+            <h2 id="join">Rejoindre un salon</h2>
+            <input type="text" class="textInput" id="codeSalle" placeholder="Entrer le code de la salle" v-model="roomCode"
                 maxlength="4">
-            <button v-if="homepage === true && !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
+            <button id="submitJoin" v-if="homepage === true && !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
         </div>
     </form>
 
@@ -25,6 +29,7 @@
 import io from 'socket.io-client';
 import { defineComponent } from 'vue';
 import roomOptions from '../RoomOptions/RoomOptions.vue';
+
 
 // interface Room {
 //     id: string;

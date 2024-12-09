@@ -1,0 +1,78 @@
+body {
+    background: linear-gradient(90deg, rgba(255, 138, 0, 0.1), rgba(229, 46, 113, 0.1)); /* Dégradé très léger */
+}
+
+.textInput {
+    transform: translate(-50%, -50%);
+    width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    position: absolute;
+    text-align: center;
+    border-image: linear-gradient(90deg, #ff8a00, #e52e71) 1;
+    padding: 15px 20px;
+}
+
+#pseudo {
+    top: 15%;
+    left: 50%;
+    width: 300px;
+  }
+
+#nomSalle {
+    top: 50%;
+    left: 20%;
+}
+
+#codeSalle {
+    top: 50%;
+    left: 70%;
+}
+
+.submitBtn {
+    background: linear-gradient(90deg, #ff8a00, #e52e71);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    padding: 15px 30px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+}
+
+.submitBtn:hover {
+    transform: scale(1.1);
+  }
+
+
+#join {
+    margin-left: 450px;
+    margin-top: 230px;
+}
+
+#creer {
+    margin-top: 230px;
+    margin-left: 200px;
+}
+
+
+#submitJoin {
+    margin-top: 75px;
+    margin-left: 730px;
+}
+
+#submitCreer {
+    margin-top: 75px;
+    margin-left: 525px;
+}
+
+h2 {
+font-family: Verdana, sans-serif;
+font-size: 2rem;
+  background: linear-gradient(90deg, #ff8a00, #e52e71);
+  -webkit-background-clip: text;
+  color: transparent;
+}
