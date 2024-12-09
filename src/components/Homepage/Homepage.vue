@@ -6,7 +6,7 @@
         <div class="inputs-container">
             <h2 id="creer">Créer un salon</h2>
             <input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
-            <input type="text" class="textInput" id="nomSalle" placeholder="Entrer le nom de la salle" v-model="roomName" maxlength="15">
+            <input v-if="!roomId" type="text" class="textInput" id="nomSalle" v-bind:placeholder="'Salle de ' + pseudo" v-model="roomName" maxlength="15">
 
             <button id="submitCreer" v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
                 salon</button>
@@ -15,8 +15,7 @@
             </div>
         </div>
         <div class="inputs-container">
-            <h2 id="join">Rejoindre un salon</h2>
-            <input type="text" class="textInput" id="codeSalle" placeholder="Entrer le code de la salle" v-model="roomCode"
+            <input type="text" class="textInput" placeholder="Entrer le code de la salle" v-model="roomCode"
                 maxlength="4">
             <button id="submitJoin" v-if="homepage === true && !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
         </div>
@@ -136,11 +135,15 @@ export default defineComponent({
          * @constructor
          */
         handleSubmit() {
-            if (this.pseudo && this.roomName) {
+            if (this.pseudo) {
                 this.player.host = true;
                 this.player.username = this.pseudo;
                 this.player.socketId = this.socket.id ?? "";
 
+                if (this.roomName == "") {
+                    this.roomName = "Salle de " + this.pseudo;    
+                }
+                
                 this.socket.emit('playerData', this.player, this.roomName);
 
                 this.homepage = false;

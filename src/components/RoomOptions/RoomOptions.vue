@@ -1,11 +1,10 @@
 <template>
-    <section>
+    <section class="mainSection">
         <div class="playersList">
             <h3>Joueurs</h3>
             <div class="playersContainer" v-for="room in rooms" :key="room.id">
                 <div class="playerContainer" v-if="room.id === player.roomId">
                     <h3>{{ room.roomName }}</h3>
-                    <h4>{{ room }}</h4>
                     <div v-for="rplayer in room.players" :key="rplayer.socketId"
                         :class="{ currentPlayer: rplayer.socketId === player.socketId }">
 
@@ -85,7 +84,7 @@
             </div>
         </section>
 
-        <PokerGame v-else :socket="socket" :tasks="tasks"></PokerGame>
+        <PokerGame v-else :socket="socket" :currentRoom="currentRoom" :tasks="tasks" :gameMode="gameMode" :maxRoundTimer="maxRoundTimer" :maxDebateTimer="maxDebateTimer"></PokerGame>
     </section>
 
 </template>
@@ -120,10 +119,8 @@ export default defineComponent({
             game: false,
             gameModes: ["Unanimité", "Majorité absolue"],
             gameMode: "",
-            roundTimer: 0,
-            debateTimer: 0,
-            currentRound: 0,
-            interRoundDuration: 5,
+            maxRoundTimer: 0,
+            maxDebateTimer: 0,
             isKicked: false,
             jsonImported: false,
         }
@@ -163,6 +160,10 @@ export default defineComponent({
 
             this.game = true;
             this.socket.emit('sendPlayer', this.player);
+        });
+
+        this.socket.on('endGame', () => {
+            this.game = false;
         });
 
         this.socket.on('new host', (newHostId) => {

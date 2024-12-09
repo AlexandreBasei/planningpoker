@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("playerData", (player, roomName) => {
-        console.log(`[playerData] ${player.username} - ${roomName}`);
+        console.log(`[playerData] ${player.username}`);
 
         let room = null;
 
@@ -63,11 +63,39 @@ io.on("connection", (socket) => {
 
     socket.on('sendPlayer', (player) => {
         io.to(player.socketId).emit('receivePlayer', player);
+        log(`[sendPlayer] - ${player.username}`);
     });
 
     socket.on("send room options", (roomId, roomOptions) => {
         io.to(roomId).emit('receive room options', roomOptions);
-    })
+    });
+
+    socket.on('sendCard', (roomId, card, player, playerID) => {
+        rooms.forEach(r => {
+            if (r.id === roomId) {
+                r.cards.push([card, player, playerID]);
+
+                if (r.cards.length === r.players.length) {
+                    io.to(roomId).emit('allCardsSent', r.cards);
+                    log(`[allCardsSent] - ${r.cards}`);
+                    r.cards = [];
+                }
+            }
+        });
+    });
+
+    socket.on("sendMsg", (roomId, msg, username) => {
+        io.to(roomId).emit('receiveMsg', msg, username);
+        log(`[sendMsg] - ${msg}`);
+    });
+
+    socket.on("endDebate", (roomId) => {
+        io.to(roomId).emit('endDebate');
+    });
+
+    socket.on("endGame", (roomId) => {
+        io.to(roomId).emit('endGame');
+    });
 
     socket.on('set host', (player) => {
         rooms.forEach(r => {
@@ -103,7 +131,7 @@ io.on("connection", (socket) => {
  * @return The generated room array
  */
 function createRoom(player, roomName) {
-    const room = { id: roomId(), roomName: roomName, players: [] };
+    const room = { id: roomId(), roomName: roomName, players: [], cards: [] };
 
     player.roomId = room.id;
 
@@ -150,6 +178,10 @@ function exitRoom(socketId) {
             }
         })
     })
+}
+
+function findRoomById(roomId) {
+    return rooms.find(room => room.id === roomId) || null;
 }
 
 // // Route to redirect to index.html
