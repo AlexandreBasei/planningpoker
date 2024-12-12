@@ -3,9 +3,9 @@
     <link href="homepage.css" rel="stylesheet">
     <form v-if="homepage == true" class="homepage-form">
         
+        <input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
         <div class="inputs-container">
-            <h2 id="creer">Créer un salon</h2>
-            <input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+            <h2 id="creer">Créer un salon</h2> 
             <input v-if="!roomId" type="text" class="textInput" id="nomSalle" v-bind:placeholder="'Salle de ' + pseudo" v-model="roomName" maxlength="15">
 
             <button id="submitCreer" v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
