@@ -2,6 +2,14 @@ body {
     background: linear-gradient(90deg, rgba(255, 138, 0, 0.1), rgba(229, 46, 113, 0.1));
 }
 
+.inputs-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
 .textInput {
     transform: translate(-50%, -50%);
     width: 200px;
@@ -19,23 +27,22 @@ body {
     linear-gradient(90deg, #ff8a00, #e52e71);
     background-origin: border-box;
     background-clip: padding-box, border-box;
-    
 }
 
 #pseudo {
     top: 15%;
     left: 50%;
-    width: 300px;
-  }
+    width: 20%;
+}
 
 #nomSalle {
-    top: 50%;
-    left: 20%;
+    top: 325px;
+    left: 300px;
 }
 
 #codeSalle {
-    top: 50%;
-    left: 70%;
+    top: 325px;
+    left: 240px;
 }
 
 .submitBtn {
@@ -54,35 +61,33 @@ body {
 
 .submitBtn:hover {
     transform: scale(1.1);
-  }
+}
 
-  #join {
-    margin-left: 250px;
-    margin-top: 150px;
+
+#join { 
+    margin-top: 200px;
+    margin-left: -150px;
 }
 
 #creer {
-    margin-left: 200px;
-    margin-top: 150px;
+    margin-left: 20px;
+    margin-top: 200px;
 }
 
 #submitJoin {
-    margin-top: 75px;
-    margin-left: 550px;
-    justify-content: center;
-    align-items: center;
-    display: flex;
+    margin-top: 35px;
+    margin-left: 150px;
 }
 
 #submitCreer {
-    margin-top: 50px;
-    margin-left: 450px;
+    margin-top: 35px;
+    margin-left: 300px;
 }
 
 h2 {
-font-family: Verdana, sans-serif;
-font-size: 2rem;
-  background: linear-gradient(90deg, #ff8a00, #e52e71);
-  -webkit-background-clip: text;
-  color: transparent;
+    font-family: Verdana, sans-serif;
+    font-size: 2rem;
+    background: linear-gradient(90deg, #ff8a00, #e52e71);
+    -webkit-background-clip: text;
+    color: transparent;
 }
