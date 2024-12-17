@@ -21,6 +21,12 @@
                     </button>
                 </div>
 
+                <div v-if="interRound">
+                    <p>Difficulté attribuée :</p>
+                    <img alt="Carte"
+                        :src="require('@/assets/images/svg/cartes/cartes_' + resultJson.tasks[taskIndex - 1].note + '.svg')">
+                </div>
+
                 <div v-if="debateOn">
                     <h2>Débat</h2>
                     <form class="chatdiv" @submit.prevent="sendMsg">
@@ -49,6 +55,13 @@
     <section v-else class="endScreen">
         <h2>Fin de la partie</h2>
         <h3>La partie est terminée, merci d'avoir utilisé notre outil !</h3>
+
+        <h3>Récapitulatif de la partie :</h3>
+        <div v-for="(task, index) in resultJson.tasks" :key="index">
+            <p>{{ task.nom }} :</p>
+            <img alt="Carte" v-if="task.note != ''"
+                :src="require('@/assets/images/svg/cartes/cartes_' + task.note + '.svg')">
+        </div>
 
         <button @click="exportResult">Exporter le résultat</button>
         <button @click="restartBtn" v-if="player.host">Retourner au salon</button>
@@ -98,6 +111,7 @@ export default defineComponent({
             player: {},
             taskIndex: 0,
             roundTimer: 0,
+            interRound: false,
             debateTimer: 10,
             debateOn: false,
             debatePermission: false,
@@ -235,8 +249,19 @@ export default defineComponent({
 
     methods: {
         nextStep() {
+
+            this.cardsOn = false;
+            this.interRound = true;
+
+            setTimeout(() => {
+                this.interRound = false;
+                this.cardsOn = true;
+            }, 5000);
+
             if (this.taskIndex >= this.tasks.length) {
-                this.endScreen = true;
+                setTimeout(() => {
+                    this.endScreen = true;
+                }, 5000);
             }
         },
 
