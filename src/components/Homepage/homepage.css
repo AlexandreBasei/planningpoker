@@ -3,15 +3,26 @@ body {
 }
 
 .inputs-container {
+    display: flex;
     position: relative;
-    width: 800px;
-    height: 600px;
-    margin: 0 auto;
-    overflow: hidden;
+    width: 35%;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    flex-wrap: wrap;
+}
+
+.homepage-form{
+    display: flex;
+    flex-flow: wrap row;
+    justify-content: center;
+    align-items: center;
 }
 
 .textInput {
-    transform: translate(-50%, -50%);
+    /* transform: translate(-50%, -50%); */
     width: 200px;
     padding: 10px;
     font-size: 16px;
@@ -30,19 +41,16 @@ body {
 }
 
 #pseudo {
-    top: 15%;
-    left: 50%;
-    width: 20%;
+    position: relative;
+    width: 100vw;
 }
 
 #nomSalle {
-    top: 325px;
-    left: 300px;
+    position: relative;
 }
 
 #codeSalle {
-    top: 325px;
-    left: 240px;
+    position: relative;
 }
 
 .submitBtn {
@@ -65,23 +73,11 @@ body {
 
 
 #join { 
-    margin-top: 200px;
-    margin-left: -150px;
+    width: 100%;
 }
 
 #creer {
-    margin-left: 20px;
-    margin-top: 200px;
-}
-
-#submitJoin {
-    margin-top: 35px;
-    margin-left: 150px;
-}
-
-#submitCreer {
-    margin-top: 35px;
-    margin-left: 300px;
+    width: 100%;
 }
 
 h2 {
