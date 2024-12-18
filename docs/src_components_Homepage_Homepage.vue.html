@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/components/Homepage/Homepage.vue</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/components/Homepage/Homepage.vue</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>&lt;!-- La "vue" de notre composant, partie visible par l'utilisateur (HTML) -->
+&lt;template>
+    &lt;link href="homepage.css" rel="stylesheet">
+    &lt;form v-if="homepage == true" class="homepage-form">
+        
+        &lt;input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+        &lt;div class="inputs-container">
+            &lt;h2 id="creer">Créer un salon&lt;/h2> 
+            &lt;input v-if="!roomId" type="text" class="textInput" id="nomSalle" v-bind:placeholder="'Salle de ' + pseudo" v-model="roomName" maxlength="15">
+
+            &lt;button id="submitCreer" v-if="homepage === true &amp;&amp; !roomId" class="submitBtn" @click="handleSubmit()">Créer un
+                salon&lt;/button>
+            &lt;div v-else v-for="room in rooms" :key="room.id">
+                &lt;button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre le salon&lt;/button>
+            &lt;/div>
+        &lt;/div>
+        &lt;div class="inputs-container">
+            &lt;h2 id="join">Rejoindre un salon&lt;/h2>
+            &lt;input type="text" class="textInput" id="codeSalle" placeholder="Entrer le code de la salle" v-model="roomCode"
+                maxlength="4">
+            &lt;button id="submitJoin" v-if="homepage === true &amp;&amp; !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre&lt;/button>
+        &lt;/div>
+    &lt;/form>
+
+    &lt;roomOptions v-if="!homepage" :socket="socket">&lt;/roomOptions>
+&lt;/template>
+
+&lt;script>
+import io from 'socket.io-client';
+import { defineComponent } from 'vue';
+import roomOptions from '../RoomOptions/RoomOptions.vue';
+
+
+// interface Room {
+//     id: string;
+//     players: {
+//         host: boolean,
+//         roomId: string,
+//         socketId: string,
+//         username: string,
+//     }[];
+// }
+
+// Définition du composant
+export default defineComponent({
+    name: 'home_page',
+    components: {
+        roomOptions,
+    },
+
+    // Définition des variables
+    data() {
+        return {
+            homepage: true,
+            rooms: [],
+            roomName: "",
+            pseudo: "",
+            roomCode: "",
+            socket: io("http://localhost:4000"),
+            player: {
+                host: false,
+                roomId: "",
+                username: "",
+                socketId: ""
+            },
+            roomId: "",
+        }
+    },
+
+    // Code à exécuter au chargement de la page
+    mounted() {
+        // Récupération des rooms depuis le serveur en temps réel
+        if (this.homepage) {
+            setInterval(() => {
+                this.updRooms();
+            }, 20);
+        }
+
+        // Recherche d'une roomId dans l'url de la page, si aucun n'est trouvé il est défini comme nul par défaut
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const roomId = urlParams.get('room');
+        this.roomId = roomId ?? "";
+    },
+
+    //Définition des méthodes de notre composant
+    methods: {
+        //Appel au serveur via un événement socket.io pour récupérer le tableau des rooms
+        updRooms() {
+            this.socket.emit('get rooms');
+
+            this.socket.on('list rooms', (rooms) => {
+                this.rooms = rooms;
+            });
+        },
+
+        /**
+         * Room entry management and storage of player information in the player object
+         * @constructor
+         * @param {array} room the room array
+         */
+        joinRoom(room) {
+            if (this.pseudo) {
+                this.player.roomId = room.id;
+                this.player.username = this.pseudo;
+                this.player.socketId = this.socket.id ?? "";
+                
+                this.socket.emit('playerData', this.player);
+                this.homepage = false;
+                this.roomId = "";
+            }
+        },
+
+        /**
+         * Room entry management with a room code and storage of player information in the player object
+         * @constructor
+         */
+        joinRoomWithCode() {
+            if (this.pseudo &amp;&amp; this.roomCode) {
+                this.rooms.forEach(room => {
+                    if (room.id == this.roomCode) {
+                        this.player.roomId = room.id;
+                        this.player.username = this.pseudo;
+                        this.player.socketId = this.socket.id ?? "";
+
+                        this.socket.emit('playerData', this.player);
+                        this.homepage = false;
+                        this.roomId = "";
+                    }
+                });
+            }
+        },
+
+        /**
+         * Room creation form validation management 
+         * @constructor
+         */
+        handleSubmit() {
+            if (this.pseudo) {
+                this.player.host = true;
+                this.player.username = this.pseudo;
+                this.player.socketId = this.socket.id ?? "";
+
+                if (this.roomName == "") {
+                    this.roomName = "Salle de " + this.pseudo;    
+                }
+                
+                this.socket.emit('playerData', this.player, this.roomName);
+
+                this.homepage = false;
+            } else {
+                alert("Vous devez entrer un pseudonyme !")
+            }
+        },
+
+        /**
+         * Page reload management to delete the roomId in the url
+         * @constructor
+         */
+        reload() {
+            window.location.search = '?room=';
+        },
+
+        /**
+         * Delete the roomId in the url
+         * @constructor
+         */
+        back() {
+            window.location.search = '?room=';
+        },
+
+    }
+})
+&lt;/script>
+
+// Importation du CSS, ici "scoped" signifie que le css sera spécifique à ce composant
+&lt;style scoped>
+@import url("./homepage.css");
+@import url("./homepage-mobile.css");
+&lt;/style></code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="PokerGame.html">PokerGame</a></li><li><a href="Server.html">Server</a></li></ul><h3>Classes</h3><ul><li><a href="PokerGame.cardClick.html">cardClick</a></li><li><a href="PokerGame.debateTimerStart.html">debateTimerStart</a></li><li><a href="PokerGame.endDebate.html">endDebate</a></li><li><a href="PokerGame.exportResult.html">exportResult</a></li><li><a href="PokerGame.nextStep.html">nextStep</a></li><li><a href="PokerGame.restartBtn.html">restartBtn</a></li><li><a href="PokerGame.sendMsg.html">sendMsg</a></li><li><a href="Server.createRoom.html">createRoom</a></li><li><a href="Server.exitRoom.html">exitRoom</a></li><li><a href="Server.findRoomById.html">findRoomById</a></li><li><a href="Server.playerData.html">playerData</a></li><li><a href="Server.roomId.html">roomId</a></li><li><a href="Server.sendCard.html">sendCard</a></li><li><a href="Server.sendMsg.html">sendMsg</a></li><li><a href="Server.sendPlayer.html">sendPlayer</a></li><li><a href="Server.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="Server.setHost.html">setHost</a></li><li><a href="Server.startGame.html">startGame</a></li><li><a href="methods.back.html">back</a></li><li><a href="methods.handleSubmit.html">handleSubmit</a></li><li><a href="methods.joinRoom.html">joinRoom</a></li><li><a href="methods.joinRoomWithCode.html">joinRoomWithCode</a></li><li><a href="methods.reload.html">reload</a></li><li><a href="methods.startGame.html">startGame</a></li></ul><h3>Events</h3><ul><li><a href="PokerGame.html#event:receivePlayer">receivePlayer</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 18 2024 20:25:08 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

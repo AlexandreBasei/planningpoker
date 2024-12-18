@@ -1,76 +1,104 @@
-<template>
-    <section class="gameBoard" v-if="!endScreen">
-        <h1>Mode de jeu : {{ gameMode }}</h1>
-        <!-- <h1 v-if="maxRoundTimer != 0 && cardsOn">Temps restant : {{ roundTimer }}</h1>
-        <h1 v-if="maxRoundTimer == 0 && cardsOn">Temps restant : illimité</h1> -->
-        <h1 v-if="maxDebateTimer != 0 && debateOn">Temps restant : {{ debateTimer }}</h1>
-        <h1 v-if="maxDebateTimer == 0 && debateOn">Temps restant : illimité</h1>
-        <div v-for="(task, index) in tasks" :key="index">
-            <div v-if="index == taskIndex">
-                <h2>Tâche {{ index + 1 }} : {{ task.nom }}</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/components/PokerGame/PokerGame.vue</title>
 
-                <div v-if="cardsOn" class="cardList">
-                    <button @click="cardClick(card)" v-for="(card, index) in cardsImgList" :key="index" :id="card"
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/components/PokerGame/PokerGame.vue</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>&lt;template>
+    &lt;section class="gameBoard" v-if="!endScreen">
+        &lt;h1>Mode de jeu : {{ gameMode }}&lt;/h1>
+        &lt;!-- &lt;h1 v-if="maxRoundTimer != 0 &amp;&amp; cardsOn">Temps restant : {{ roundTimer }}&lt;/h1>
+        &lt;h1 v-if="maxRoundTimer == 0 &amp;&amp; cardsOn">Temps restant : illimité&lt;/h1> -->
+        &lt;h1 v-if="maxDebateTimer != 0 &amp;&amp; debateOn">Temps restant : {{ debateTimer }}&lt;/h1>
+        &lt;h1 v-if="maxDebateTimer == 0 &amp;&amp; debateOn">Temps restant : illimité&lt;/h1>
+        &lt;div v-for="(task, index) in tasks" :key="index">
+            &lt;div v-if="index == taskIndex">
+                &lt;h2>Tâche {{ index + 1 }} : {{ task.nom }}&lt;/h2>
+
+                &lt;div v-if="cardsOn" class="cardList">
+                    &lt;button @click="cardClick(card)" v-for="(card, index) in cardsImgList" :key="index" :id="card"
                         class="cardBtn">
-                        <div :class="{ flipped: cardsOn }">
-                            <img class="card-front" alt="Carte"
+                        &lt;div :class="{ flipped: cardsOn }">
+                            &lt;img class="card-front" alt="Carte"
                                 :src="require('@/assets/images/svg/cartes/cartes_' + card + '.svg')">
-                            <img class="card-back" :src="require('@/assets/images/svg/cartes/cartes_dos.svg')"
+                            &lt;img class="card-back" :src="require('@/assets/images/svg/cartes/cartes_dos.svg')"
                                 alt="Dos carte">
-                        </div>
-                    </button>
-                </div>
+                        &lt;/div>
+                    &lt;/button>
+                &lt;/div>
 
-                <div v-if="interRound">
-                    <p>Difficulté attribuée :</p>
-                    <img alt="Carte"
+                &lt;div v-if="interRound">
+                    &lt;p>Difficulté attribuée :&lt;/p>
+                    &lt;img alt="Carte"
                         :src="require('@/assets/images/svg/cartes/cartes_' + resultJson.tasks[taskIndex - 1].note + '.svg')">
-                </div>
+                &lt;/div>
 
-                <div v-if="debateOn">
-                    <h2>Débat</h2>
-                    <form class="chatdiv" @submit.prevent="sendMsg">
-                        <div class="chatbox">
-                            <div v-for="(msg, index) in msgList" :key="index">
-                                <p v-if="msg[1] == this.player.username" class="myMsg">{{ msg[1] }} : {{ msg[0] }}</p>
-                                <p v-else class="otherMsg">{{ msg[1] }} : {{ msg[0] }}</p>
-                            </div>
-                        </div>
-                        <input v-if="debatePermission" type="text" v-model="chatMsg"><button v-if="debatePermission"
-                            type="submit" @click="sendMsg">Envoyer</button>
-                    </form>
-                    <p>Tout le monde n'est pas en accord avec la difficulté de la tâche : les deux extrêmes, débattez
-                        pour trouver un consensus.</p>
+                &lt;div v-if="debateOn">
+                    &lt;h2>Débat&lt;/h2>
+                    &lt;form class="chatdiv" @submit.prevent="sendMsg">
+                        &lt;div class="chatbox">
+                            &lt;div v-for="(msg, index) in msgList" :key="index">
+                                &lt;p v-if="msg[1] == this.player.username" class="myMsg">{{ msg[1] }} : {{ msg[0] }}&lt;/p>
+                                &lt;p v-else class="otherMsg">{{ msg[1] }} : {{ msg[0] }}&lt;/p>
+                            &lt;/div>
+                        &lt;/div>
+                        &lt;input v-if="debatePermission" type="text" v-model="chatMsg">&lt;button v-if="debatePermission"
+                            type="submit" @click="sendMsg">Envoyer&lt;/button>
+                    &lt;/form>
+                    &lt;p>Tout le monde n'est pas en accord avec la difficulté de la tâche : les deux extrêmes, débattez
+                        pour trouver un consensus.&lt;/p>
 
-                    <div v-for="(card, index) in cards" :key="index">
-                        <h3>Joueur {{ card[1] }}</h3>
-                        <img alt="Carte" :src="require('@/assets/images/svg/cartes/cartes_' + card[0] + '.svg')">
-                    </div>
-                    <button v-if="player.host == true" @click="endDebate">Terminer le débat</button>
-                </div>
-            </div>
-        </div>
-    </section>
+                    &lt;div v-for="(card, index) in cards" :key="index">
+                        &lt;h3>Joueur {{ card[1] }}&lt;/h3>
+                        &lt;img alt="Carte" :src="require('@/assets/images/svg/cartes/cartes_' + card[0] + '.svg')">
+                    &lt;/div>
+                    &lt;button v-if="player.host == true" @click="endDebate">Terminer le débat&lt;/button>
+                &lt;/div>
+            &lt;/div>
+        &lt;/div>
+    &lt;/section>
 
-    <section v-else class="endScreen">
-        <h2>Fin de la partie</h2>
-        <h3>La partie est terminée, merci d'avoir utilisé notre outil !</h3>
+    &lt;section v-else class="endScreen">
+        &lt;h2>Fin de la partie&lt;/h2>
+        &lt;h3>La partie est terminée, merci d'avoir utilisé notre outil !&lt;/h3>
 
-        <h3>Récapitulatif de la partie :</h3>
-        <div v-for="(task, index) in resultJson.tasks" :key="index">
-            <p>{{ task.nom }} :</p>
-            <img alt="Carte" v-if="task.note != ''"
+        &lt;h3>Récapitulatif de la partie :&lt;/h3>
+        &lt;div v-for="(task, index) in resultJson.tasks" :key="index">
+            &lt;p>{{ task.nom }} :&lt;/p>
+            &lt;img alt="Carte" v-if="task.note != ''"
                 :src="require('@/assets/images/svg/cartes/cartes_' + task.note + '.svg')">
-        </div>
+        &lt;/div>
 
-        <button @click="exportResult">Exporter le résultat</button>
-        <button @click="restartBtn" v-if="player.host">Retourner au salon</button>
-        <p v-if="!player.host">En attente de l'hôte de la partie...</p>
+        &lt;button @click="exportResult">Exporter le résultat&lt;/button>
+        &lt;button @click="restartBtn" v-if="player.host">Retourner au salon&lt;/button>
+        &lt;p v-if="!player.host">En attente de l'hôte de la partie...&lt;/p>
 
-    </section>
-</template>
+    &lt;/section>
+&lt;/template>
 
-<script>
+&lt;script>
 import { defineComponent } from 'vue';
 import 'socket.io-client';
 
@@ -152,7 +180,7 @@ export default defineComponent({
         /**
          * Receive the player object from the server
          * @event PokerGame#receivePlayer
-         * @param {object} player - The player object sended by the server
+         * @param {Object} player - The player object sended by the server
          */
         this.socket.on('receivePlayer', (player) => {
             this.player = player;
@@ -160,11 +188,6 @@ export default defineComponent({
 
         });
 
-        /**
-         * Receives all the voted cards from the server, validates the difficulty of the current task based on the gamemode or starts a debate if there is no consensus
-         * @event PokerGame#allCardsSent
-         * @param {object} cards - The object containing voted cards (name and difficulty)
-         */
         this.socket.on('allCardsSent', (cards) => {
             setTimeout(() => {
 
@@ -172,7 +195,7 @@ export default defineComponent({
                 this.debatePermission = false;
 
                 //Si toutes les cartes sont les mêmes et que c'est la carte café, télécharger le résultat
-                if (cards.every((val, i, arr) => val[0] === arr[0][0]) && cards[0][0] === 'cafe') {
+                if (cards.every((val, i, arr) => val[0] === arr[0][0]) &amp;&amp; cards[0][0] === 'cafe') {
                     this.endScreen = true;
                 }
                 else {
@@ -185,7 +208,7 @@ export default defineComponent({
 
                         //On retire les cartes interro et café
                         const sortedCards = cards
-                            .filter(card => card[0] !== 'interro' && card[0] !== 'cafe')
+                            .filter(card => card[0] !== 'interro' &amp;&amp; card[0] !== 'cafe')
                             .sort((a, b) => Number(a[0]) - Number(b[0]));
 
                         // Si une carte est différente
@@ -199,7 +222,7 @@ export default defineComponent({
                             sortedCards.forEach(card => {
                                 console.log(card[0], firstCard, lastCard);
 
-                                if (sortedCards[0][2] == this.player.socketId || sortedCards[sortedCards.length - 1][2] == this.player.socketId || (card[0] == firstCard && card[2] == this.player.socketId) || (card[0] == lastCard && card[2] == this.player.socketId)) {
+                                if (sortedCards[0][2] == this.player.socketId || sortedCards[sortedCards.length - 1][2] == this.player.socketId || (card[0] == firstCard &amp;&amp; card[2] == this.player.socketId) || (card[0] == lastCard &amp;&amp; card[2] == this.player.socketId)) {
                                     this.debatePermission = true;
                                 }
                             });
@@ -234,7 +257,7 @@ export default defineComponent({
                                 sortedCards.forEach(card => {
                                     console.log(card[0], firstCard, lastCard);
 
-                                    if (sortedCards[0][2] == this.player.socketId || sortedCards[sortedCards.length - 1][2] == this.player.socketId || (card[0] == firstCard && card[2] == this.player.socketId) || (card[0] == lastCard && card[2] == this.player.socketId)) {
+                                    if (sortedCards[0][2] == this.player.socketId || sortedCards[sortedCards.length - 1][2] == this.player.socketId || (card[0] == firstCard &amp;&amp; card[2] == this.player.socketId) || (card[0] == lastCard &amp;&amp; card[2] == this.player.socketId)) {
                                         this.debatePermission = true;
                                     }
                                 });
@@ -248,11 +271,6 @@ export default defineComponent({
             }, 2000);
         });
 
-        /**
-         * Receives debate messages from the server
-         * @event PokerGame#receiveMsg
-         * @param {object} player - The player object sended by the server
-         */
         this.socket.on('receiveMsg', (msg, username) => {
             this.msgList.push([msg, username]);
         });
@@ -302,7 +320,7 @@ export default defineComponent({
                 this.debateTimer = this.maxDebateTimer;
                 let timer2 = setInterval(() => {
                     this.debateTimer--;
-                    if (this.debateTimer <= 0) {
+                    if (this.debateTimer &lt;= 0) {
                         this.endDebate();
                         this.debateTimer = this.maxDebateTimer;
                         clearInterval(timer2);
@@ -381,9 +399,31 @@ export default defineComponent({
         },
     }
 })
-</script>
+&lt;/script>
 
-<style lang="css" scoped>
+&lt;style lang="css" scoped>
 @import url('./test_pokergame.css');
 @import url('./pokergame.css');
-</style>
+&lt;/style></code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="PokerGame.html">PokerGame</a></li><li><a href="Server.html">Server</a></li></ul><h3>Classes</h3><ul><li><a href="PokerGame.cardClick.html">cardClick</a></li><li><a href="PokerGame.debateTimerStart.html">debateTimerStart</a></li><li><a href="PokerGame.endDebate.html">endDebate</a></li><li><a href="PokerGame.exportResult.html">exportResult</a></li><li><a href="PokerGame.nextStep.html">nextStep</a></li><li><a href="PokerGame.restartBtn.html">restartBtn</a></li><li><a href="PokerGame.sendMsg.html">sendMsg</a></li><li><a href="Server.createRoom.html">createRoom</a></li><li><a href="Server.exitRoom.html">exitRoom</a></li><li><a href="Server.findRoomById.html">findRoomById</a></li><li><a href="Server.playerData.html">playerData</a></li><li><a href="Server.roomId.html">roomId</a></li><li><a href="Server.sendCard.html">sendCard</a></li><li><a href="Server.sendMsg.html">sendMsg</a></li><li><a href="Server.sendPlayer.html">sendPlayer</a></li><li><a href="Server.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="Server.setHost.html">setHost</a></li><li><a href="Server.startGame.html">startGame</a></li><li><a href="methods.back.html">back</a></li><li><a href="methods.handleSubmit.html">handleSubmit</a></li><li><a href="methods.joinRoom.html">joinRoom</a></li><li><a href="methods.joinRoomWithCode.html">joinRoomWithCode</a></li><li><a href="methods.reload.html">reload</a></li><li><a href="methods.startGame.html">startGame</a></li></ul><h3>Events</h3><ul><li><a href="PokerGame.html#event:receivePlayer">receivePlayer</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 18 2024 20:25:08 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
