@@ -1,17 +1,52 @@
+@font-face {
+    font-family: 'Poker';
+    src: url('@/assets/fonts/Poker.ttf') format('truetype')
+}
+
 body {
     background: linear-gradient(90deg, rgba(255, 138, 0, 0.1), rgba(229, 46, 113, 0.1));
+    overflow-x: hidden;
 }
 
 .inputs-container {
     display: flex;
     position: relative;
-    width: 35%;
+    width: 40%;
+    background-color: #ffffff95;
     flex-direction: row;
     align-content: center;
     justify-content: center;
     align-items: center;
     gap: 50px;
     flex-wrap: wrap;
+    padding: 40px;
+    clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%);
+    transition: all .2s ease;
+    
+    & h2{
+        margin: 0;
+    }
+}
+
+/* Premier conteneur : déplacement vers la droite au survol */
+.inputs-container:nth-child(2):hover {
+    transform: translateX(10vw) scale(1.05);
+}
+
+/* Deuxième conteneur : déplacement vers la gauche au survol */
+.inputs-container:nth-child(3):hover {
+    transform: translateX(-10vw) scale(1.05);
+}
+
+/* Synchronisation des déplacements entre les deux conteneurs */
+.inputs-container:nth-child(2):hover ~ .inputs-container:nth-child(3) {
+    transform: translateX(10vw);
+}
+
+@supports selector(:has(+ *)) {
+    .inputs-container:has(+ .inputs-container:hover) {
+        transform: translateX(-10vw);
+    }
 }
 
 .homepage-form{
@@ -26,7 +61,7 @@ body {
     width: 200px;
     padding: 10px;
     font-size: 16px;
-    position: absolute;
+    position: relative;
     text-align: center;
     border-radius: 30px;
     padding: 15px 20px;
@@ -38,20 +73,41 @@ body {
     linear-gradient(90deg, #ff8a00, #e52e71);
     background-origin: border-box;
     background-clip: padding-box, border-box;
+    transition: all .2s ease;
+}
+
+.textInput:focus {
+    outline: none; /* Désactive le contour par défaut */
+    border-color: transparent; /* Garde la couleur du bord existant */
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    /* transform: scale(1.08); */
+}
+
+#titre{
+    font-size: 4rem;
+    font-family: 'Poker';
+    margin : 2vh 0 0 0;
+    pointer-events: none;
+    transform: translateY(-3vh);
+}
+
+#pseudoDiv {
+    position: relative;
+    width: 100vw;
+    margin: 8vh 0 4vh 0;
 }
 
 #pseudo {
     position: relative;
-    width: 100vw;
 }
 
-#nomSalle {
+/* #nomSalle {
     position: relative;
 }
 
 #codeSalle {
     position: relative;
-}
+} */
 
 .submitBtn {
     background: linear-gradient(90deg, #ff8a00, #e52e71);
@@ -65,10 +121,12 @@ body {
     cursor: pointer;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     text-transform: uppercase;
+    width: 17vw;
+    transition: all .2s ease;
 }
 
 .submitBtn:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 

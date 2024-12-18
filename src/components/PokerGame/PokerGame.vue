@@ -1,6 +1,5 @@
 <template>
     <section class="gameBoard" v-if="!endScreen">
-        <h1>Mode de jeu : {{ gameMode }}</h1>
         <!-- <h1 v-if="maxRoundTimer != 0 && cardsOn">Temps restant : {{ roundTimer }}</h1>
         <h1 v-if="maxRoundTimer == 0 && cardsOn">Temps restant : illimité</h1> -->
         <h1 v-if="maxDebateTimer != 0 && debateOn">Temps restant : {{ debateTimer }}</h1>

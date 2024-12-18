@@ -1,11 +1,14 @@
 <!-- La "vue" de notre composant, partie visible par l'utilisateur (HTML) -->
 <template>
-    <link href="homepage.css" rel="stylesheet">
+    <h1 id="titre">Planning Poker</h1>
     <form v-if="homepage == true" class="homepage-form">
         
-        <input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+        <div id="pseudoDiv">
+            <input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+        </div>
+        
         <div class="inputs-container">
-            <h2 id="creer">Créer un salon</h2> 
+            <h2 id="creer">Créer un salon</h2>
             <input v-if="!roomId" type="text" class="textInput" id="nomSalle" v-bind:placeholder="'Salle de ' + pseudo" v-model="roomName" maxlength="15">
 
             <button id="submitCreer" v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
