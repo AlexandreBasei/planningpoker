@@ -101,14 +101,6 @@ body {
     position: relative;
 }
 
-/* #nomSalle {
-    position: relative;
-}
-
-#codeSalle {
-    position: relative;
-} */
-
 .submitBtn {
     background: linear-gradient(90deg, #ff8a00, #e52e71);
     border: none;
@@ -132,10 +124,12 @@ body {
 
 #join { 
     width: 100%;
+    pointer-events: none;
 }
 
 #creer {
     width: 100%;
+    pointer-events: none;
 }
 
 h2 {
