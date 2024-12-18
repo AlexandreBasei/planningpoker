@@ -55,13 +55,14 @@
                 <div>
                     <h4 id="partie">Paramètres de la partie</h4>
 
-                    <label for="roundTimer">Durée des tours : {{ roundTimer === 0 ? "∞" : roundTimer }} secondes</label>
-                    <input name="roundTimer" type="range" value="1" min="0" max="120" v-model="roundTimer"
-                        @change="sendRoomOptions">
+                    <!-- <label for="roundTimer">Durée des tours : {{ maxRroundTimer === 0 ? "∞" : maxRoundTimer }} secondes</label>
+                    <input name="roundTimer" type="range" value="1" min="0" max="120" v-model="maxRoundTimer"
+                        @change="sendRoomOptions"> -->
 
 
-                    <label for="roundTimer">Durée des débats : {{ debateTimer === 0 ? "∞" : debateTimer }} secondes</label>
-                    <input name="debateTimer" type="range" value="1" min="0" max="240" v-model="debateTimer"
+                    <label for="roundTimer">Durée des débats : {{ maxDebateTimer === 0 ? "∞" : maxDebateTimer }}
+                        secondes</label>
+                    <input name="debateTimer" type="range" value="1" min="0" max="240" v-model="maxDebateTimer"
                         @change="sendRoomOptions">
                 </div>
 
@@ -77,15 +78,16 @@
                 <div>
                     <h4>Paramètres de la partie</h4>
 
-                    <p>Durée des tours : {{ roundTimer === 0 ? "∞" : roundTimer }} secondes</p>
+                    <!-- <p>Durée des tours : {{ maxRoundTimer === 0 ? "∞" : maxRoundTimer }} secondes</p> -->
 
-                    <p>Durée des débats : {{ debateTimer === 0 ? "∞" : debateTimer }} secondes</p>
+                    <p>Durée des débats : {{ maxDebateTimer === 0 ? "∞" : maxDebateTimer }} secondes</p>
                 </div>
 
             </div>
         </section>
 
-        <PokerGame v-else :socket="socket" :currentRoom="currentRoom" :tasks="tasks" :gameMode="gameMode" :maxRoundTimer="maxRoundTimer" :maxDebateTimer="maxDebateTimer"></PokerGame>
+        <PokerGame v-else :socket="socket" :currentRoom="currentRoom" :tasks="tasks" :gameMode="gameMode"
+            :maxDebateTimer="maxDebateTimer"></PokerGame>
     </section>
 
 </template>
@@ -120,7 +122,7 @@ export default defineComponent({
             game: false,
             gameModes: ["Unanimité", "Majorité absolue"],
             gameMode: "",
-            maxRoundTimer: 0,
+            // maxRoundTimer: 0,
             maxDebateTimer: 0,
             isKicked: false,
             jsonImported: false,
@@ -147,8 +149,8 @@ export default defineComponent({
         this.socket.on('receive room options', (roomOptions) => {
             if (!this.player.host) {
                 this.gameMode = roomOptions.gameMode;
-                this.roundTimer = roomOptions.roundTimer;
-                this.debateTimer = roomOptions.debateTimer;
+                // this.maxRoundTimer = roomOptions.roundTimer;
+                this.maxDebateTimer = roomOptions.debateTimer;
                 this.jsonImported = roomOptions.jsonImported;
                 console.log("RECUUU : ", roomOptions);
             }
@@ -215,7 +217,7 @@ export default defineComponent({
         },
 
         sendRoomOptions() {
-            this.socket.emit('send room options', this.currentRoom, { gameMode: this.gameMode, roundTimer: this.roundTimer, debateTimer: this.debateTimer, jsonImported: this.jsonImported });
+            this.socket.emit('send room options', this.currentRoom, { gameMode: this.gameMode, debateTimer: this.maxDebateTimer, jsonImported: this.jsonImported });
         },
 
         setGameMode(modeIndex) {
