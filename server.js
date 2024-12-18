@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("playerData", (player, roomName) => {
-        playerData(player, roomName);
+        playerData(socket, player, roomName);
     })
 
     //Send all the rooms to the client
@@ -164,7 +164,7 @@ function findRoomById(roomId) {
  * @param {string} roomName - The room's name defined by the host of the room
  * @return The generated room array
  */
-function playerData(player, roomName) {
+function playerData(socket, player, roomName) {
     console.log(`[playerData] ${player.username}`);
 
     let room = null;
