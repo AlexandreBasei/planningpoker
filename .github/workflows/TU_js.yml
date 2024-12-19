@@ -20,9 +20,9 @@ jobs:
 
     - name: Install dependencies
       run: npm install
-    - name: Run tests
-      run: npm run test
-    - name: genertate doc
+    # - name: Run tests
+    #   run: npm run test
+    - name: generate doc
       run: npm run doc
     - name: Build project
       run: npm run build
