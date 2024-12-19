@@ -35,6 +35,9 @@ io.on("connection", (socket) => {
 
     //Send all the rooms to the client
     socket.on('get rooms', () => {
+        // Check if some rooms are empty and remove them
+        rooms = rooms.filter(room => room.players.length > 0);
+
         io.to(socket.id).emit('list rooms', rooms);
     });
 

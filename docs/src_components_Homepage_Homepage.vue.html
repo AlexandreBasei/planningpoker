@@ -28,25 +28,30 @@
         <article>
             <pre class="prettyprint source linenums"><code>&lt;!-- La "vue" de notre composant, partie visible par l'utilisateur (HTML) -->
 &lt;template>
-    &lt;link href="homepage.css" rel="stylesheet">
+    &lt;h1 id="titre">Planning Poker&lt;/h1>
     &lt;form v-if="homepage == true" class="homepage-form">
         
-        &lt;input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+        &lt;div id="pseudoDiv">
+            &lt;input type="text" class="textInput" id="pseudo" placeholder="Entrer votre pseudo" v-model="pseudo" maxlength="15">
+        &lt;/div>
+        
         &lt;div class="inputs-container">
-            &lt;h2 id="creer">Créer un salon&lt;/h2> 
+
+            &lt;h2 v-if="!roomId" class="inputsTitle">Créer un salon&lt;/h2>
+            &lt;h2 v-else class="inputsTitle">Rejoindre un salon&lt;/h2>
+            
             &lt;input v-if="!roomId" type="text" class="textInput" id="nomSalle" v-bind:placeholder="'Salle de ' + pseudo" v-model="roomName" maxlength="15">
 
-            &lt;button id="submitCreer" v-if="homepage === true &amp;&amp; !roomId" class="submitBtn" @click="handleSubmit()">Créer un
-                salon&lt;/button>
-            &lt;div v-else v-for="room in rooms" :key="room.id">
-                &lt;button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre le salon&lt;/button>
+            &lt;button id="submitCreer" v-if="homepage === true &amp;&amp; !roomId" class="submitBtn" @click="handleSubmit()">Créer&lt;/button>
+            &lt;div v-else v-for="room in rooms" :key="room.id" class="joinRoomDiv">
+                &lt;button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre&lt;/button>
             &lt;/div>
         &lt;/div>
         &lt;div class="inputs-container">
-            &lt;h2 id="join">Rejoindre un salon&lt;/h2>
+            &lt;h2 class="inputsTitle">Rejoindre un salon&lt;/h2>
             &lt;input type="text" class="textInput" id="codeSalle" placeholder="Entrer le code de la salle" v-model="roomCode"
                 maxlength="4">
-            &lt;button id="submitJoin" v-if="homepage === true &amp;&amp; !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre&lt;/button>
+            &lt;button id="submitJoin" v-if="homepage === true" class="submitBtn" @click="joinRoomWithCode()">Rejoindre&lt;/button>
         &lt;/div>
     &lt;/form>
 
@@ -58,19 +63,11 @@ import io from 'socket.io-client';
 import { defineComponent } from 'vue';
 import roomOptions from '../RoomOptions/RoomOptions.vue';
 
-
-// interface Room {
-//     id: string;
-//     players: {
-//         host: boolean,
-//         roomId: string,
-//         socketId: string,
-//         username: string,
-//     }[];
-// }
-
 // Définition du composant
 export default defineComponent({
+    /**
+     * @namespace HomePage
+     */
     name: 'home_page',
     components: {
         roomOptions,
@@ -97,11 +94,14 @@ export default defineComponent({
 
     // Code à exécuter au chargement de la page
     mounted() {
+        // Changement du titre de la page
+        document.title = "Planning Poker - Accueil";
+        
         // Récupération des rooms depuis le serveur en temps réel
         if (this.homepage) {
             setInterval(() => {
                 this.updRooms();
-            }, 20);
+            }, 500);
         }
 
         // Recherche d'une roomId dans l'url de la page, si aucun n'est trouvé il est défini comme nul par défaut
@@ -113,7 +113,12 @@ export default defineComponent({
 
     //Définition des méthodes de notre composant
     methods: {
-        //Appel au serveur via un événement socket.io pour récupérer le tableau des rooms
+
+        /**
+         * Get all rooms from the server
+         * @constructor
+         * @memberof HomePage
+         */
         updRooms() {
             this.socket.emit('get rooms');
 
@@ -126,6 +131,7 @@ export default defineComponent({
          * Room entry management and storage of player information in the player object
          * @constructor
          * @param {array} room the room array
+         * @memberof HomePage
          */
         joinRoom(room) {
             if (this.pseudo) {
@@ -142,6 +148,7 @@ export default defineComponent({
         /**
          * Room entry management with a room code and storage of player information in the player object
          * @constructor
+         * @memberof HomePage
          */
         joinRoomWithCode() {
             if (this.pseudo &amp;&amp; this.roomCode) {
@@ -160,8 +167,9 @@ export default defineComponent({
         },
 
         /**
-         * Room creation form validation management 
+         * Room creation form validation management, sends player information to the server
          * @constructor
+         * @memberof HomePage
          */
         handleSubmit() {
             if (this.pseudo) {
@@ -184,14 +192,16 @@ export default defineComponent({
         /**
          * Page reload management to delete the roomId in the url
          * @constructor
+         * @memberof HomePage
          */
         reload() {
             window.location.search = '?room=';
         },
 
         /**
-         * Delete the roomId in the url
+         * Deletes the roomId in the url
          * @constructor
+         * @memberof HomePage
          */
         back() {
             window.location.search = '?room=';
@@ -215,13 +225,13 @@ export default defineComponent({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="PokerGame.html">PokerGame</a></li><li><a href="Server.html">Server</a></li></ul><h3>Classes</h3><ul><li><a href="PokerGame.cardClick.html">cardClick</a></li><li><a href="PokerGame.debateTimerStart.html">debateTimerStart</a></li><li><a href="PokerGame.endDebate.html">endDebate</a></li><li><a href="PokerGame.exportResult.html">exportResult</a></li><li><a href="PokerGame.nextStep.html">nextStep</a></li><li><a href="PokerGame.restartBtn.html">restartBtn</a></li><li><a href="PokerGame.sendMsg.html">sendMsg</a></li><li><a href="Server.createRoom.html">createRoom</a></li><li><a href="Server.exitRoom.html">exitRoom</a></li><li><a href="Server.findRoomById.html">findRoomById</a></li><li><a href="Server.playerData.html">playerData</a></li><li><a href="Server.roomId.html">roomId</a></li><li><a href="Server.sendCard.html">sendCard</a></li><li><a href="Server.sendMsg.html">sendMsg</a></li><li><a href="Server.sendPlayer.html">sendPlayer</a></li><li><a href="Server.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="Server.setHost.html">setHost</a></li><li><a href="Server.startGame.html">startGame</a></li><li><a href="methods.back.html">back</a></li><li><a href="methods.handleSubmit.html">handleSubmit</a></li><li><a href="methods.joinRoom.html">joinRoom</a></li><li><a href="methods.joinRoomWithCode.html">joinRoomWithCode</a></li><li><a href="methods.reload.html">reload</a></li><li><a href="methods.startGame.html">startGame</a></li></ul><h3>Events</h3><ul><li><a href="PokerGame.html#event:receivePlayer">receivePlayer</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="HomePage.html">HomePage</a></li><li><a href="PokerGame.html">PokerGame</a></li><li><a href="RoomOptions.html">RoomOptions</a></li><li><a href="Server.html">Server</a></li></ul><h3>Classes</h3><ul><li><a href="HomePage.back.html">back</a></li><li><a href="HomePage.handleSubmit.html">handleSubmit</a></li><li><a href="HomePage.joinRoom.html">joinRoom</a></li><li><a href="HomePage.joinRoomWithCode.html">joinRoomWithCode</a></li><li><a href="HomePage.reload.html">reload</a></li><li><a href="HomePage.updRooms.html">updRooms</a></li><li><a href="PokerGame.cardClick.html">cardClick</a></li><li><a href="PokerGame.debateTimerStart.html">debateTimerStart</a></li><li><a href="PokerGame.endDebate.html">endDebate</a></li><li><a href="PokerGame.exportResult.html">exportResult</a></li><li><a href="PokerGame.nextStep.html">nextStep</a></li><li><a href="PokerGame.restartBtn.html">restartBtn</a></li><li><a href="PokerGame.sendMsg.html">sendMsg</a></li><li><a href="RoomOptions.copyLink.html">copyLink</a></li><li><a href="RoomOptions.displayHostMenu.html">displayHostMenu</a></li><li><a href="RoomOptions.exitRoom.html">exitRoom</a></li><li><a href="RoomOptions.importJson.html">importJson</a></li><li><a href="RoomOptions.isButtonClicked.html">isButtonClicked</a></li><li><a href="RoomOptions.kickPlayer.html">kickPlayer</a></li><li><a href="RoomOptions.resetPlayer.html">resetPlayer</a></li><li><a href="RoomOptions.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="RoomOptions.setGameMode.html">setGameMode</a></li><li><a href="RoomOptions.setHost.html">setHost</a></li><li><a href="RoomOptions.startGame.html">startGame</a></li><li><a href="RoomOptions.updRooms.html">updRooms</a></li><li><a href="Server.createRoom.html">createRoom</a></li><li><a href="Server.exitRoom.html">exitRoom</a></li><li><a href="Server.findRoomById.html">findRoomById</a></li><li><a href="Server.playerData.html">playerData</a></li><li><a href="Server.roomId.html">roomId</a></li><li><a href="Server.sendCard.html">sendCard</a></li><li><a href="Server.sendMsg.html">sendMsg</a></li><li><a href="Server.sendPlayer.html">sendPlayer</a></li><li><a href="Server.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="Server.setHost.html">setHost</a></li><li><a href="Server.startGame.html">startGame</a></li></ul><h3>Events</h3><ul><li><a href="PokerGame.html#event:allCardsSent">allCardsSent</a></li><li><a href="PokerGame.html#event:endDebate">endDebate</a></li><li><a href="PokerGame.html#event:receiveMsg">receiveMsg</a></li><li><a href="PokerGame.html#event:receivePlayer">receivePlayer</a></li><li><a href="RoomOptions.html#event:endGame">endGame</a></li><li><a href="RoomOptions.html#event:joinRoom">joinRoom</a></li><li><a href="RoomOptions.html#event:kicked">kicked</a></li><li><a href="RoomOptions.html#event:listRooms">listRooms</a></li><li><a href="RoomOptions.html#event:newHost">newHost</a></li><li><a href="RoomOptions.html#event:receiveRoomOptions">receiveRoomOptions</a></li><li><a href="RoomOptions.html#event:startGame">startGame</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 18 2024 20:25:08 GMT+0100 (heure normale d’Europe centrale)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Dec 19 2024 11:40:47 GMT+0100 (heure normale d’Europe centrale)
 </footer>
 
 <script> prettyPrint(); </script>

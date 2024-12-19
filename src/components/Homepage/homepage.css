@@ -121,15 +121,23 @@ body {
     transform: scale(1.05);
 }
 
-
-#join { 
+.inputsTitle{
     width: 100%;
     pointer-events: none;
 }
 
-#creer {
+.joinRoomDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 0px;
+    height: fit-content;
+    display: none;
+}
+
+.joinRoomDiv:last-of-type {
+    display: block;
     width: 100%;
-    pointer-events: none;
 }
 
 h2 {

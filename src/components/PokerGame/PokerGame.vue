@@ -256,6 +256,10 @@ export default defineComponent({
             this.msgList.push([msg, username]);
         });
 
+        /**
+         * Receives the endDebate event from the server, hides the debate screen, displays the card screen and starts the next task
+         * @event PokerGame#endDebate
+         */
         this.socket.on('endDebate', () => {
             this.debateOn = false;
             this.cardsOn = true;

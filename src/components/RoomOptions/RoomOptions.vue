@@ -99,6 +99,9 @@ import { defineComponent } from 'vue';
 import PokerGame from '../PokerGame/PokerGame.vue';
 
 export default defineComponent({
+    /**
+     * @namespace RoomOptions
+     */
     name: 'roomOptions',
     homepage: '',
     components: {
@@ -129,23 +132,46 @@ export default defineComponent({
         }
     },
 
-    computed: {
-        currentRoomPlayers() {
-            return this.rooms.find(room => room.id === this.player.roomId);
-        },
-    },
-
     mounted() {
 
         this.updRooms();
 
+        /**
+         * Get the rooms list from the server
+         * @event RoomOptions#listRooms
+         * @param {object} rooms - The rooms list object sended by the server
+         */
+        this.socket.on('list rooms', (rooms) => {
+            this.rooms = rooms;
+        });
+
+        setTimeout(() => {
+            this.rooms.forEach(room => {
+                if (room.id === this.currentRoom) {
+                    console.log(room);
+
+                    document.title = room.roomName;
+                }
+            });
+        }, 1000);
+
         this.gameMode = this.gameModes[0];
 
+        /**
+         * Handles the client-side joining of a room
+         * @event RoomOptions#joinRoom
+         * @param {object} player - The player object sended by the server
+         */
         this.socket.on('join room', (player) => {
             this.player = player;
             this.currentRoom = player.roomId;
         });
 
+        /**
+         * Get the room options from the server
+         * @event RoomOptions#receiveRoomOptions
+         * @param {object} roomOptions - The room options object sended by the server
+         */
         this.socket.on('receive room options', (roomOptions) => {
             if (!this.player.host) {
                 this.gameMode = roomOptions.gameMode;
@@ -156,6 +182,11 @@ export default defineComponent({
             }
         });
 
+        /**
+         * Handles the client-side starting of a game by getting the tasks from the server
+         * @event RoomOptions#startGame
+         * @param {object} tasks - The tasks object sended by the server
+         */
         this.socket.on('start game', (tasks) => {
             if (!this.player.host) {
                 this.tasks = tasks;
@@ -165,10 +196,19 @@ export default defineComponent({
             this.socket.emit('sendPlayer', this.player);
         });
 
+        /**
+         * Handles the client-side ending of a game
+         * @event RoomOptions#endGame
+         */
         this.socket.on('endGame', () => {
             this.game = false;
         });
 
+        /**
+         * Handles the definition of a new host
+         * @event RoomOptions#newHost
+         * @param {string} newHostId - The socket id of the new host
+         */
         this.socket.on('new host', (newHostId) => {
             console.log('This.player.socketId', this.player.socketId);
 
@@ -177,6 +217,11 @@ export default defineComponent({
             }
         });
 
+        /**
+         * Handles the exclusion of a player from the game
+         * @event RoomOptions#kicked
+         * @param {string} kickedId - The socket id of the kicked player
+         */
         this.socket.on('kicked', (kickedId) => {
             if (this.player.socketId === kickedId) {
                 this.isKicked = true;
@@ -192,6 +237,7 @@ export default defineComponent({
         /**
          * Game start button management (start game if a json was imported)
          * @constructor
+         * @memberof RoomOptions
          */
         startGame() {
             if (this.tasks.length === 0) {
@@ -202,6 +248,13 @@ export default defineComponent({
                 this.socket.emit('start game', this.currentRoom, this.tasks);
             }
         },
+
+        /**
+         * Import a json file containing the tasks to evaluate
+         * @constructor
+         * @memberof RoomOptions
+         * @param {object} event - The event object containing the imported json tasks file
+         */
         importJson(event) { //Get the tasks from the json file
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -216,35 +269,40 @@ export default defineComponent({
 
         },
 
+        /**
+         * Send the room options to the server
+         * @constructor
+         * @memberof RoomOptions
+         */
         sendRoomOptions() {
             this.socket.emit('send room options', this.currentRoom, { gameMode: this.gameMode, debateTimer: this.maxDebateTimer, jsonImported: this.jsonImported });
         },
 
+        /**
+         * Sets the game mode
+         * @constructor
+         * @memberof RoomOptions
+         * @param {integer} modeIndex - The index of the game mode in the gameModes array
+         */
         setGameMode(modeIndex) {
             this.gameMode = this.gameModes[modeIndex];
             this.sendRoomOptions();
         },
 
-        beforeUnloadHandler() {
-            if (!this.isKicked) {
-                // const confirmationMessage = "Êtes-vous sûr de vouloir quitter cette page ? Vous quitterez la partie en cours";
-                // (event || window.event).returnValue = confirmationMessage;
-                // return confirmationMessage;
-                this.socket.emit("exit room");
-            }
-        },
+        /**
+         * Update the rooms list
+         * @constructor
+         * @memberof RoomOptions
+         */
         updRooms() {
             this.socket.emit('get rooms');
-
-            this.socket.on('list rooms', (rooms) => {
-                this.rooms = rooms;
-                rooms.forEach(room => {
-                    if (this.player.roomId === room.id) {
-                        this.gamesChosen = room.gamesChosen;
-                    }
-                });
-            });
         },
+
+        /**
+         * Room exit management
+         * @constructor
+         * @memberof RoomOptions
+         */
         exitRoom() {
             this.rooms.forEach(room => {
                 if (room.id === this.currentRoom) {
@@ -255,6 +313,13 @@ export default defineComponent({
                 }
             });
         },
+
+        /**
+         * Sets a new host of the room and sends the information to the server
+         * @constructor
+         * @memberof RoomOptions
+         * @param {object} player - The player object
+         */
         setHost(player) {
             this.player.host = false;
             this.socket.emit("set host", player);
@@ -265,6 +330,13 @@ export default defineComponent({
                 menuToDisplay.style.display = "none";
             }
         },
+
+        /**
+         * Kicks a player from the room by sending the information to the server
+         * @constructor
+         * @memberof RoomOptions
+         * @param {string} socketId - The socket id of the player to kick
+         */
         kickPlayer(socketId) {
             this.rooms.forEach(room => {
                 if (room.id === this.currentRoom) {
@@ -273,6 +345,12 @@ export default defineComponent({
                 }
             });
         },
+
+        /**
+         * Copy the room link to the clipboard
+         * @constructor
+         * @memberof RoomOptions
+         */
         copyLink() {
             const link = `${window.location.origin}?room=${this.player.roomId}`;
             navigator.clipboard.writeText(link).then(() => {
@@ -284,6 +362,13 @@ export default defineComponent({
                 console.error('Failed to copy text: ', err);
             });
         },
+
+        /**
+         * Display the kicking or promote menu to the host when clicking on a player
+         * @constructor
+         * @memberof RoomOptions
+         * @param {string} socketId - The socket id of the player to kick or promote
+         */
         displayHostMenu(socketId) {
             const menuToDisplay = document.getElementById(socketId);
 
@@ -300,6 +385,13 @@ export default defineComponent({
                 menuToDisplay.style.display = "flex";
             }
         },
+
+        /**
+         * Handles the host menu hiding when clicking outside of it
+         * @constructor
+         * @memberof RoomOptions
+         * @param {object} event - The event object
+         */
         isButtonClicked(buttons, target) {
 
             for (const button of buttons) {
@@ -309,6 +401,12 @@ export default defineComponent({
             }
             return false;
         },
+
+        /**
+         * Resets the player object
+         * @constructor
+         * @memberof RoomOptions
+         */
         resetPlayer() {
             this.player = {
                 host: false,

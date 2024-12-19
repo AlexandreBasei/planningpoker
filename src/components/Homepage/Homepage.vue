@@ -8,20 +8,22 @@
         </div>
         
         <div class="inputs-container">
-            <h2 id="creer">Créer un salon</h2>
+
+            <h2 v-if="!roomId" class="inputsTitle">Créer un salon</h2>
+            <h2 v-else class="inputsTitle">Rejoindre un salon</h2>
+            
             <input v-if="!roomId" type="text" class="textInput" id="nomSalle" v-bind:placeholder="'Salle de ' + pseudo" v-model="roomName" maxlength="15">
 
-            <button id="submitCreer" v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer un
-                salon</button>
-            <div v-else v-for="room in rooms" :key="room.id">
-                <button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre le salon</button>
+            <button id="submitCreer" v-if="homepage === true && !roomId" class="submitBtn" @click="handleSubmit()">Créer</button>
+            <div v-else v-for="room in rooms" :key="room.id" class="joinRoomDiv">
+                <button v-if="room.id === roomId" @click="joinRoom(room)" class="submitBtn">Rejoindre</button>
             </div>
         </div>
         <div class="inputs-container">
-            <h2 id="join">Rejoindre un salon</h2>
+            <h2 class="inputsTitle">Rejoindre un salon</h2>
             <input type="text" class="textInput" id="codeSalle" placeholder="Entrer le code de la salle" v-model="roomCode"
                 maxlength="4">
-            <button id="submitJoin" v-if="homepage === true && !roomId" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
+            <button id="submitJoin" v-if="homepage === true" class="submitBtn" @click="joinRoomWithCode()">Rejoindre</button>
         </div>
     </form>
 
@@ -33,19 +35,11 @@ import io from 'socket.io-client';
 import { defineComponent } from 'vue';
 import roomOptions from '../RoomOptions/RoomOptions.vue';
 
-
-// interface Room {
-//     id: string;
-//     players: {
-//         host: boolean,
-//         roomId: string,
-//         socketId: string,
-//         username: string,
-//     }[];
-// }
-
 // Définition du composant
 export default defineComponent({
+    /**
+     * @namespace HomePage
+     */
     name: 'home_page',
     components: {
         roomOptions,
@@ -72,11 +66,14 @@ export default defineComponent({
 
     // Code à exécuter au chargement de la page
     mounted() {
+        // Changement du titre de la page
+        document.title = "Planning Poker - Accueil";
+        
         // Récupération des rooms depuis le serveur en temps réel
         if (this.homepage) {
             setInterval(() => {
                 this.updRooms();
-            }, 20);
+            }, 500);
         }
 
         // Recherche d'une roomId dans l'url de la page, si aucun n'est trouvé il est défini comme nul par défaut
@@ -88,7 +85,12 @@ export default defineComponent({
 
     //Définition des méthodes de notre composant
     methods: {
-        //Appel au serveur via un événement socket.io pour récupérer le tableau des rooms
+
+        /**
+         * Get all rooms from the server
+         * @constructor
+         * @memberof HomePage
+         */
         updRooms() {
             this.socket.emit('get rooms');
 
@@ -101,6 +103,7 @@ export default defineComponent({
          * Room entry management and storage of player information in the player object
          * @constructor
          * @param {array} room the room array
+         * @memberof HomePage
          */
         joinRoom(room) {
             if (this.pseudo) {
@@ -117,6 +120,7 @@ export default defineComponent({
         /**
          * Room entry management with a room code and storage of player information in the player object
          * @constructor
+         * @memberof HomePage
          */
         joinRoomWithCode() {
             if (this.pseudo && this.roomCode) {
@@ -135,8 +139,9 @@ export default defineComponent({
         },
 
         /**
-         * Room creation form validation management 
+         * Room creation form validation management, sends player information to the server
          * @constructor
+         * @memberof HomePage
          */
         handleSubmit() {
             if (this.pseudo) {
@@ -159,14 +164,16 @@ export default defineComponent({
         /**
          * Page reload management to delete the roomId in the url
          * @constructor
+         * @memberof HomePage
          */
         reload() {
             window.location.search = '?room=';
         },
 
         /**
-         * Delete the roomId in the url
+         * Deletes the roomId in the url
          * @constructor
+         * @memberof HomePage
          */
         back() {
             window.location.search = '?room=';
