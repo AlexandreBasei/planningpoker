@@ -219,7 +219,7 @@ export default defineComponent({
                             const maxCardCount = count[maxCard];
                             console.log("MAX CARD COUNT", maxCardCount);
 
-                            if (maxCardCount > cards.length / 2) {
+                            if (maxCardCount > cards.length / 2 && cards.length > 0) {
                                 this.resultJson["tasks"][this.taskIndex].note = maxCard;
                                 this.taskIndex++;
                                 this.nextStep();
