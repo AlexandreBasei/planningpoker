@@ -1,20 +1,14 @@
 # Planning Poker
 ## Présentation du projet
-L'objectif de l'application est de permettre à des joueurs de faire une partie de planning poker, en respectant les règles vues en cours.
+L’objectif de notre application est de permettre à des joueurs de faire une partie de planning poker à distance. 
 
-L'application peut être à distance (chaque joueur utilise son propre dispositif, points bonus) ou locale (les joueurs choisissent chacun à leur tour leurs cartes).
+Un menu permet de choisir son pseudo et de créer ou rejoindre un salon. 
 
-Un menu permet de décider du nombre de joueurs et de rentrer un pseudo pour chacun des joueurs. Le menu doit aussi permettre de choisir parmi différentes règles de planning poker (règles strictes, moyenne, médiane, etc.)
+Il est possible de modifier les paramètres du salon pour choisir le mode de jeu entre la majorité absolue ou l’unanimité, importer un fichier JSON contenant les tâches à évaluer et décider de la durée des débats, lorsqu’ils sont nécessaires. 
 
-On doit pouvoir entrer une liste de fonctionnalités (backlog) en JSON (vous êtes libre d'utiliser la structure que vous souhaitez).
+Une fois toutes les tâches évaluées, une page récapitulative apparaît. Il est alors possible de sauvegarder le résultat de la partie. 
 
-Une fois que chacun à voté, l'application valide ou non la fonctionnalité en fonction des règles choisies via le menu. Si la fonctionnalité n'est pas validée, on recommence le vote.
-
-Lorsque tout le backlog est validé, l'application enregistre un fichier JSON avec, pour chaque fonctionnalité, la difficulté estimée par l'équipe.
-
-Note : Si tous les joueurs utilisent la carte café, l'application doit enregistrer un fichier JSON avec l'état d'avancement du backlog. Ce fichier JSON doit pouvoir être chargé via le menu pour "reprendre" une partie.
-
-Note 2 : Vous êtres très fortement encouragés à ajouter des fonctionnalités qui vous semblent utiles au bon déroulement du planning poker (chronomètre, espace de discussion, etc.)
+De plus, il est possible d’interrompre la partie et d’enregistrer les tâches déjà notées sans pour autant avoir terminé la partie. Un espace de discussion écrit est aussi présent pour faciliter la communication.
 
 ## Modes de jeu
 - Unanimité
@@ -23,7 +17,6 @@ Note 2 : Vous êtres très fortement encouragés à ajouter des fonctionnalités
 ## Langage
 - JavaScript (NodeJS)
 - Framework VueJS
-- Version mobile responsive
 
 ## Project setup
 ```
