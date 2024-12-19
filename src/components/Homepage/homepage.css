@@ -57,7 +57,6 @@ body {
 }
 
 .textInput {
-    /* transform: translate(-50%, -50%); */
     width: 200px;
     padding: 10px;
     font-size: 16px;
@@ -77,10 +76,9 @@ body {
 }
 
 .textInput:focus {
-    outline: none; /* Désactive le contour par défaut */
-    border-color: transparent; /* Garde la couleur du bord existant */
+    outline: none;
+    border-color: transparent;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-    /* transform: scale(1.08); */
 }
 
 #titre{

@@ -469,8 +469,8 @@ form .messages{
 
 #parametres {
     font-size: 2.5rem;
-    position: absolute;
-    top: 5%;
+    position: fixed;
+    top: 10%;
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(90deg, rgba(255, 138, 0, 1), rgba(229, 46, 113, 1));
@@ -483,7 +483,7 @@ form .messages{
 .mode {
     font-size: 1.5rem;
     text-align: center;
-    position: absolute;
+    position: fixed;
     top: 25%;
     left: 50%; 
     transform: translateX(-50%);
@@ -493,21 +493,39 @@ form .messages{
     margin: 0;
 }
 
-.modeButton {
+.modeContainer {
+    position: fixed;
+    position: fixed;
+    top: 35%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+}
+
+.buttonImport, .modeButton {
     border-radius: 50px;
-    /*padding: 5px 10px;
-    font-size: 14px;*/
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    font-size: 14px;
     font-weight: bold;
     letter-spacing: 1px;
     cursor: pointer;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     text-transform: uppercase;
+    transition: background 0.3s ease;
 }
+
+.buttonImport:hover, .modeButton:hover {
+    background: #e0e0e0; /* Couleur de fond au survol */
+}
+
 
 .import {
     font-size: 1.5rem;
     text-align: center;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%; 
     transform: translateX(-50%);
@@ -517,10 +535,24 @@ form .messages{
     margin: 0;
 }
 
+.buttonImport {
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 17%;
+}
+
+
 .duree {
     font-size: 1.5rem;
     text-align: center;
-    position: absolute;
+    position: fixed;
     top: 75%;
     left: 50%; 
     transform: translateX(-50%);
@@ -528,6 +560,54 @@ form .messages{
     text-transform: uppercase;
     letter-spacing: 2px;
     margin: 0;
+}
+
+label.round,
+input.round {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+label.round {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    top: 80%;
+}
+
+input.round {
+    width: 200px;
+    height: 5px;
+    background: #ccc;
+    border-radius: 5px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    margin-top: 10px;
+    cursor: pointer;
+    top: 83%;
+}
+
+input.round::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #e52e71;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+input.round::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #e52e71;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .start {
@@ -542,11 +622,63 @@ form .messages{
     cursor: pointer;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     text-transform: uppercase;
-    margin-top: 160%;
-    margin-left: 175%;
     width: 100%;
+    position: fixed;
+    bottom: 20px;
+    left: 42%;
+    max-width: 300px;
+    text-align: center;
 }
 
 .start:hover {
     transform: scale(1.1);
+}
+
+.roomName {
+    font-size: 1rem;
+    top: 7%;
+    left: 20%;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.joueurs {
+    background: linear-gradient(90deg, rgba(255, 138, 0, 1), rgba(229, 46, 113, 1));
+    -webkit-background-clip: text;
+    color: transparent;
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.shareLink {
+    border-radius: 50px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    transition: background 0.3s ease;
+}
+
+.quitter {
+    background: linear-gradient(90deg, #ff8a00, #e52e71);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    padding: 15px 30px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    width: 17vw;
+    transition: all .2s ease;
+    margin-top: 5%;
+    margin-left: 7%;
 }
