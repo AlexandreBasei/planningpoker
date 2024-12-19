@@ -43,40 +43,40 @@
         <section class="roomOptions" v-if="game == false">
             <h3 id="parametres">Paramètres du salon</h3>
             <div v-if="player.host" class="personalization-section">
-                <label for="importJson">Importer un fichier json contenant les tâches à évaluer</label>
-                <input type="file" @change="importJson" accept=".json" id="importJson">
+                <label class="import" for="importJson">Importer un fichier json contenant les tâches à évaluer</label>
+                <input class="buttonImport" type="file" @change="importJson" accept=".json" id="importJson">
 
-                <h4 id="mode">Mode de jeu : {{ gameMode }}</h4>
+                <h4 class="mode">Mode de jeu : {{ gameMode }}</h4>
                 <div>
-                    <button v-for="(mode, index) in gameModes" :key="index" @click="setGameMode(index)">{{ mode
+                    <button class="modeButton" v-for="(mode, index) in gameModes" :key="index" @click="setGameMode(index)">{{ mode
                         }}</button>
                 </div>
 
                 <div>
-                    <h4 id="partie">Paramètres de la partie</h4>
+                    <h4 class="duree">Choix du chronomètre</h4>
 
                     <!-- <label for="roundTimer">Durée des tours : {{ maxRroundTimer === 0 ? "∞" : maxRoundTimer }} secondes</label>
                     <input name="roundTimer" type="range" value="1" min="0" max="120" v-model="maxRoundTimer"
                         @change="sendRoomOptions"> -->
 
 
-                    <label for="roundTimer">Durée des débats : {{ maxDebateTimer === 0 ? "∞" : maxDebateTimer }}
+                    <label class="round" for="roundTimer">Durée des débats : {{ maxDebateTimer === 0 ? "∞" : maxDebateTimer }}
                         secondes</label>
-                    <input name="debateTimer" type="range" value="1" min="0" max="240" v-model="maxDebateTimer"
+                    <input class="round" name="debateTimer" type="range" value="1" min="0" max="240" v-model="maxDebateTimer"
                         @change="sendRoomOptions">
                 </div>
 
-                <button @click="startGame">Lancer la partie</button>
+                <button class="start" @click="startGame">Lancer la partie</button>
             </div>
 
             <div v-if="!player.host" class="personalization-section">
                 <p v-if="jsonImported">Fichier json importé</p>
                 <p v-else>Aucun fichier json importé</p>
 
-                <h4>Mode de jeu : {{ gameMode }}</h4>
+                <h4 class="mode">Mode de jeu : {{ gameMode }}</h4>
 
                 <div>
-                    <h4>Paramètres de la partie</h4>
+                    <h4 class="partie">Paramètres de la partie</h4>
 
                     <!-- <p>Durée des tours : {{ maxRoundTimer === 0 ? "∞" : maxRoundTimer }} secondes</p> -->
 

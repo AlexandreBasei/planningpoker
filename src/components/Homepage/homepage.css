@@ -3,6 +3,7 @@ body {
 }
 
 .inputs-container {
+    display: flex;
     position: relative;
     width: 800px;
     height: 600px;
