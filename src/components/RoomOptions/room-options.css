@@ -682,3 +682,7 @@ input.round::-moz-range-thumb {
     margin-top: 5%;
     margin-left: 7%;
 }
+
+.quitter:hover {
+    transform: scale(1.05);
+}

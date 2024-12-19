@@ -1,10 +1,11 @@
 <template>
+    <link href="pokergame.css" rel="stylesheet">
     <section class="gameBoard" v-if="!endScreen">
         <!-- <h1 v-if="maxRoundTimer != 0 && cardsOn">Temps restant : {{ roundTimer }}</h1>
         <h1 v-if="maxRoundTimer == 0 && cardsOn">Temps restant : illimité</h1> -->
-        <h1 v-if="maxDebateTimer != 0 && debateOn">Temps restant : {{ debateTimer }}</h1>
-        <h1 v-if="maxDebateTimer == 0 && debateOn">Temps restant : illimité</h1>
-        <div v-for="(task, index) in tasks" :key="index">
+        <h1 class="temps" v-if="maxDebateTimer != 0 && debateOn">Temps restant : {{ debateTimer }}</h1>
+        <h1 class="temps" v-if="maxDebateTimer == 0 && debateOn">Temps restant : illimité</h1>
+        <div class="tache" v-for="(task, index) in tasks" :key="index">
             <div v-if="index == taskIndex">
                 <h2>Tâche {{ index + 1 }} : {{ task.nom }}</h2>
 
@@ -20,11 +21,13 @@
                     </button>
                 </div>
 
+                <div class="card-container">
                 <div v-if="interRound">
-                    <p>Difficulté attribuée :</p>
+                    <p class="resultat">Difficulté attribuée :</p>
                     <img alt="Carte"
                         :src="require('@/assets/images/svg/cartes/cartes_' + resultJson.tasks[taskIndex - 1].note + '.svg')">
                 </div>
+            </div>
 
                 <div v-if="debateOn">
                     <h2>Débat</h2>
@@ -35,35 +38,37 @@
                                 <p v-else class="otherMsg">{{ msg[1] }} : {{ msg[0] }}</p>
                             </div>
                         </div>
-                        <input v-if="debatePermission" type="text" v-model="chatMsg"><button v-if="debatePermission"
+                        <div class="input-container">
+                        <input class="message" v-if="debatePermission" type="text" v-model="chatMsg"><button class="envoyer" v-if="debatePermission"
                             type="submit" @click="sendMsg">Envoyer</button>
+                        </div>
                     </form>
-                    <p>Tout le monde n'est pas en accord avec la difficulté de la tâche : les deux extrêmes, débattez
+                    <p class="consensus">Tout le monde n'est pas en accord avec la difficulté de la tâche : les deux extrêmes, débattez
                         pour trouver un consensus.</p>
 
                     <div v-for="(card, index) in cards" :key="index">
                         <h3>Joueur {{ card[1] }}</h3>
                         <img alt="Carte" :src="require('@/assets/images/svg/cartes/cartes_' + card[0] + '.svg')">
                     </div>
-                    <button v-if="player.host == true" @click="endDebate">Terminer le débat</button>
+                    <button class="terminer" v-if="player.host == true" @click="endDebate">Terminer le débat</button>
                 </div>
             </div>
         </div>
     </section>
 
     <section v-else class="endScreen">
-        <h2>Fin de la partie</h2>
-        <h3>La partie est terminée, merci d'avoir utilisé notre outil !</h3>
+        <h2 class="fin">Fin de la partie</h2>
+        <h3 class="partieFinie">La partie est terminée, merci d'avoir utilisé notre outil !</h3>
 
-        <h3>Récapitulatif de la partie :</h3>
+        <h3 class="recap">Récapitulatif de la partie :</h3>
         <div v-for="(task, index) in resultJson.tasks" :key="index">
-            <p>{{ task.nom }} :</p>
-            <img alt="Carte" v-if="task.note != ''"
+            <p class="nomTache">{{ task.nom }} :</p>
+            <img class="image" alt="Carte" v-if="task.note != ''"
                 :src="require('@/assets/images/svg/cartes/cartes_' + task.note + '.svg')">
         </div>
 
-        <button @click="exportResult">Exporter le résultat</button>
-        <button @click="restartBtn" v-if="player.host">Retourner au salon</button>
+        <button class="export" @click="exportResult">Exporter le résultat</button>
+        <button class="retour" @click="restartBtn" v-if="player.host">Retourner au salon</button>
         <p v-if="!player.host">En attente de l'hôte de la partie...</p>
 
     </section>

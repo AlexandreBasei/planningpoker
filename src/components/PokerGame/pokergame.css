@@ -97,3 +97,213 @@
 .flipped .card-back {
     transform: rotateY(0deg);
 }
+
+.temps {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-left: 50px; /* Décale l'élément vers la droite de 50px */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.consensus {
+    position: absolute;
+    top: 22%;
+    left: 57%;
+    transform: translateX(-50%);
+    padding: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.tache {
+    margin-top: 8%;
+}
+
+.chatbox {
+    width: 300px;
+    height: 250px;
+    overflow-y: auto;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+    position: absolute;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    margin-bottom: 20%;
+    margin-top: 400px;
+}
+
+.myMsg {
+    background-color:rgba(255, 138, 0, 1);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 20px;
+    margin: 3px 0;
+    max-width: 80%;
+    align-self: flex-end;
+    font-size: 12px;
+    word-wrap: break-word;
+    display: inline-block;
+}
+
+.otherMsg {
+    background-color: #e1e1e1;
+    color: #333;
+    padding: 5px 8px;
+    border-radius: 20px;
+    margin: 3px 0;
+    max-width: 80%;
+    align-self: flex-start;
+    font-size: 12px;
+    word-wrap: break-word;
+    display: inline-block;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    position: relative; 
+    top: 200px;
+}
+
+.message {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+.envoyer {
+    padding: 10px 20px;
+    background-color:rgba(255, 138, 0, 1);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    align-self: flex-start; 
+    margin-top: 12px;
+}
+
+.envoyer:hover {
+    background-color:rgba(204, 104, 0, 1);
+}
+
+.terminer {
+    background: linear-gradient(90deg, #ff8a00, #e52e71);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    padding: 15px 30px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    width: 17vw;
+    transition: all .2s ease;
+    margin-top: 3%;
+}
+
+.terminer:hover {
+    transform: scale(1.05);
+}
+
+.card-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.resultat {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.card-img {
+    width: 200px;
+    height: auto;
+}
+
+.endScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding: 20px;
+    margin: 0 auto;          
+    width: 80%;              
+    max-width: 1000px; 
+    margin-left: 0;
+}
+
+.fin {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 20px 0;
+    background: linear-gradient(90deg, rgba(255, 138, 0, 1), rgba(229, 46, 113, 1));
+    -webkit-background-clip: text;
+    color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.partieFinie, .recap {
+    font-size: 1.5rem;
+    margin: 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.nomTache {
+    font-size: 1.2rem;
+    
+    margin: 10px 0;
+}
+
+.image {
+    width: 50%;
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.export, .retour {
+    background: linear-gradient(90deg, #ff8a00, #e52e71);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    padding: 15px 30px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+}
+
+.export:hover, .retour:hover {
+    transform: scale(1.05);
+}
+
+.retour {
+    margin-top: 3%;
+}
