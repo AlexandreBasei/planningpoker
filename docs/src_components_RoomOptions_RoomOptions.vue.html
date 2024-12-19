@@ -27,9 +27,10 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>&lt;template>
+    &lt;link href="room-options.css" rel="stylesheet">
     &lt;section class="mainSection">
         &lt;div class="playersList">
-            &lt;h3>Joueurs&lt;/h3>
+            &lt;h3 id="joueurs">Joueurs&lt;/h3>
             &lt;div class="playersContainer" v-for="room in rooms" :key="room.id">
                 &lt;div class="playerContainer" v-if="room.id === player.roomId">
                     &lt;h3>{{ room.roomName }}&lt;/h3>
@@ -68,19 +69,19 @@
         &lt;/div>
 
         &lt;section class="roomOptions" v-if="game == false">
-            &lt;h3>Paramètres du salon&lt;/h3>
+            &lt;h3 id="parametres">Paramètres du salon&lt;/h3>
             &lt;div v-if="player.host" class="personalization-section">
                 &lt;label for="importJson">Importer un fichier json contenant les tâches à évaluer&lt;/label>
                 &lt;input type="file" @change="importJson" accept=".json" id="importJson">
 
-                &lt;h4>Mode de jeu : {{ gameMode }}&lt;/h4>
+                &lt;h4 id="mode">Mode de jeu : {{ gameMode }}&lt;/h4>
                 &lt;div>
                     &lt;button v-for="(mode, index) in gameModes" :key="index" @click="setGameMode(index)">{{ mode
                         }}&lt;/button>
                 &lt;/div>
 
                 &lt;div>
-                    &lt;h4>Paramètres de la partie&lt;/h4>
+                    &lt;h4 id="partie">Paramètres de la partie&lt;/h4>
 
                     &lt;!-- &lt;label for="roundTimer">Durée des tours : {{ maxRroundTimer === 0 ? "∞" : maxRoundTimer }} secondes&lt;/label>
                     &lt;input name="roundTimer" type="range" value="1" min="0" max="120" v-model="maxRoundTimer"
@@ -126,6 +127,9 @@ import { defineComponent } from 'vue';
 import PokerGame from '../PokerGame/PokerGame.vue';
 
 export default defineComponent({
+    /**
+     * @namespace RoomOptions
+     */
     name: 'roomOptions',
     homepage: '',
     components: {
@@ -156,23 +160,46 @@ export default defineComponent({
         }
     },
 
-    computed: {
-        currentRoomPlayers() {
-            return this.rooms.find(room => room.id === this.player.roomId);
-        },
-    },
-
     mounted() {
 
         this.updRooms();
 
+        /**
+         * Get the rooms list from the server
+         * @event RoomOptions#listRooms
+         * @param {object} rooms - The rooms list object sended by the server
+         */
+        this.socket.on('list rooms', (rooms) => {
+            this.rooms = rooms;
+        });
+
+        setTimeout(() => {
+            this.rooms.forEach(room => {
+                if (room.id === this.currentRoom) {
+                    console.log(room);
+
+                    document.title = room.roomName;
+                }
+            });
+        }, 1000);
+
         this.gameMode = this.gameModes[0];
 
+        /**
+         * Handles the client-side joining of a room
+         * @event RoomOptions#joinRoom
+         * @param {object} player - The player object sended by the server
+         */
         this.socket.on('join room', (player) => {
             this.player = player;
             this.currentRoom = player.roomId;
         });
 
+        /**
+         * Get the room options from the server
+         * @event RoomOptions#receiveRoomOptions
+         * @param {object} roomOptions - The room options object sended by the server
+         */
         this.socket.on('receive room options', (roomOptions) => {
             if (!this.player.host) {
                 this.gameMode = roomOptions.gameMode;
@@ -183,6 +210,11 @@ export default defineComponent({
             }
         });
 
+        /**
+         * Handles the client-side starting of a game by getting the tasks from the server
+         * @event RoomOptions#startGame
+         * @param {object} tasks - The tasks object sended by the server
+         */
         this.socket.on('start game', (tasks) => {
             if (!this.player.host) {
                 this.tasks = tasks;
@@ -192,10 +224,19 @@ export default defineComponent({
             this.socket.emit('sendPlayer', this.player);
         });
 
+        /**
+         * Handles the client-side ending of a game
+         * @event RoomOptions#endGame
+         */
         this.socket.on('endGame', () => {
             this.game = false;
         });
 
+        /**
+         * Handles the definition of a new host
+         * @event RoomOptions#newHost
+         * @param {string} newHostId - The socket id of the new host
+         */
         this.socket.on('new host', (newHostId) => {
             console.log('This.player.socketId', this.player.socketId);
 
@@ -204,6 +245,11 @@ export default defineComponent({
             }
         });
 
+        /**
+         * Handles the exclusion of a player from the game
+         * @event RoomOptions#kicked
+         * @param {string} kickedId - The socket id of the kicked player
+         */
         this.socket.on('kicked', (kickedId) => {
             if (this.player.socketId === kickedId) {
                 this.isKicked = true;
@@ -219,6 +265,7 @@ export default defineComponent({
         /**
          * Game start button management (start game if a json was imported)
          * @constructor
+         * @memberof RoomOptions
          */
         startGame() {
             if (this.tasks.length === 0) {
@@ -229,6 +276,13 @@ export default defineComponent({
                 this.socket.emit('start game', this.currentRoom, this.tasks);
             }
         },
+
+        /**
+         * Import a json file containing the tasks to evaluate
+         * @constructor
+         * @memberof RoomOptions
+         * @param {object} event - The event object containing the imported json tasks file
+         */
         importJson(event) { //Get the tasks from the json file
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -243,35 +297,40 @@ export default defineComponent({
 
         },
 
+        /**
+         * Send the room options to the server
+         * @constructor
+         * @memberof RoomOptions
+         */
         sendRoomOptions() {
             this.socket.emit('send room options', this.currentRoom, { gameMode: this.gameMode, debateTimer: this.maxDebateTimer, jsonImported: this.jsonImported });
         },
 
+        /**
+         * Sets the game mode
+         * @constructor
+         * @memberof RoomOptions
+         * @param {integer} modeIndex - The index of the game mode in the gameModes array
+         */
         setGameMode(modeIndex) {
             this.gameMode = this.gameModes[modeIndex];
             this.sendRoomOptions();
         },
 
-        beforeUnloadHandler() {
-            if (!this.isKicked) {
-                // const confirmationMessage = "Êtes-vous sûr de vouloir quitter cette page ? Vous quitterez la partie en cours";
-                // (event || window.event).returnValue = confirmationMessage;
-                // return confirmationMessage;
-                this.socket.emit("exit room");
-            }
-        },
+        /**
+         * Update the rooms list
+         * @constructor
+         * @memberof RoomOptions
+         */
         updRooms() {
             this.socket.emit('get rooms');
-
-            this.socket.on('list rooms', (rooms) => {
-                this.rooms = rooms;
-                rooms.forEach(room => {
-                    if (this.player.roomId === room.id) {
-                        this.gamesChosen = room.gamesChosen;
-                    }
-                });
-            });
         },
+
+        /**
+         * Room exit management
+         * @constructor
+         * @memberof RoomOptions
+         */
         exitRoom() {
             this.rooms.forEach(room => {
                 if (room.id === this.currentRoom) {
@@ -282,6 +341,13 @@ export default defineComponent({
                 }
             });
         },
+
+        /**
+         * Sets a new host of the room and sends the information to the server
+         * @constructor
+         * @memberof RoomOptions
+         * @param {object} player - The player object
+         */
         setHost(player) {
             this.player.host = false;
             this.socket.emit("set host", player);
@@ -292,6 +358,13 @@ export default defineComponent({
                 menuToDisplay.style.display = "none";
             }
         },
+
+        /**
+         * Kicks a player from the room by sending the information to the server
+         * @constructor
+         * @memberof RoomOptions
+         * @param {string} socketId - The socket id of the player to kick
+         */
         kickPlayer(socketId) {
             this.rooms.forEach(room => {
                 if (room.id === this.currentRoom) {
@@ -300,6 +373,12 @@ export default defineComponent({
                 }
             });
         },
+
+        /**
+         * Copy the room link to the clipboard
+         * @constructor
+         * @memberof RoomOptions
+         */
         copyLink() {
             const link = `${window.location.origin}?room=${this.player.roomId}`;
             navigator.clipboard.writeText(link).then(() => {
@@ -311,6 +390,13 @@ export default defineComponent({
                 console.error('Failed to copy text: ', err);
             });
         },
+
+        /**
+         * Display the kicking or promote menu to the host when clicking on a player
+         * @constructor
+         * @memberof RoomOptions
+         * @param {string} socketId - The socket id of the player to kick or promote
+         */
         displayHostMenu(socketId) {
             const menuToDisplay = document.getElementById(socketId);
 
@@ -327,6 +413,13 @@ export default defineComponent({
                 menuToDisplay.style.display = "flex";
             }
         },
+
+        /**
+         * Handles the host menu hiding when clicking outside of it
+         * @constructor
+         * @memberof RoomOptions
+         * @param {object} event - The event object
+         */
         isButtonClicked(buttons, target) {
 
             for (const button of buttons) {
@@ -336,6 +429,12 @@ export default defineComponent({
             }
             return false;
         },
+
+        /**
+         * Resets the player object
+         * @constructor
+         * @memberof RoomOptions
+         */
         resetPlayer() {
             this.player = {
                 host: false,
@@ -365,13 +464,13 @@ export default defineComponent({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="PokerGame.html">PokerGame</a></li><li><a href="Server.html">Server</a></li></ul><h3>Classes</h3><ul><li><a href="PokerGame.cardClick.html">cardClick</a></li><li><a href="PokerGame.debateTimerStart.html">debateTimerStart</a></li><li><a href="PokerGame.endDebate.html">endDebate</a></li><li><a href="PokerGame.exportResult.html">exportResult</a></li><li><a href="PokerGame.nextStep.html">nextStep</a></li><li><a href="PokerGame.restartBtn.html">restartBtn</a></li><li><a href="PokerGame.sendMsg.html">sendMsg</a></li><li><a href="Server.createRoom.html">createRoom</a></li><li><a href="Server.exitRoom.html">exitRoom</a></li><li><a href="Server.findRoomById.html">findRoomById</a></li><li><a href="Server.playerData.html">playerData</a></li><li><a href="Server.roomId.html">roomId</a></li><li><a href="Server.sendCard.html">sendCard</a></li><li><a href="Server.sendMsg.html">sendMsg</a></li><li><a href="Server.sendPlayer.html">sendPlayer</a></li><li><a href="Server.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="Server.setHost.html">setHost</a></li><li><a href="Server.startGame.html">startGame</a></li><li><a href="methods.back.html">back</a></li><li><a href="methods.handleSubmit.html">handleSubmit</a></li><li><a href="methods.joinRoom.html">joinRoom</a></li><li><a href="methods.joinRoomWithCode.html">joinRoomWithCode</a></li><li><a href="methods.reload.html">reload</a></li><li><a href="methods.startGame.html">startGame</a></li></ul><h3>Events</h3><ul><li><a href="PokerGame.html#event:receivePlayer">receivePlayer</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="HomePage.html">HomePage</a></li><li><a href="PokerGame.html">PokerGame</a></li><li><a href="RoomOptions.html">RoomOptions</a></li><li><a href="Server.html">Server</a></li></ul><h3>Classes</h3><ul><li><a href="HomePage.back.html">back</a></li><li><a href="HomePage.handleSubmit.html">handleSubmit</a></li><li><a href="HomePage.joinRoom.html">joinRoom</a></li><li><a href="HomePage.joinRoomWithCode.html">joinRoomWithCode</a></li><li><a href="HomePage.reload.html">reload</a></li><li><a href="HomePage.updRooms.html">updRooms</a></li><li><a href="PokerGame.cardClick.html">cardClick</a></li><li><a href="PokerGame.debateTimerStart.html">debateTimerStart</a></li><li><a href="PokerGame.endDebate.html">endDebate</a></li><li><a href="PokerGame.exportResult.html">exportResult</a></li><li><a href="PokerGame.nextStep.html">nextStep</a></li><li><a href="PokerGame.restartBtn.html">restartBtn</a></li><li><a href="PokerGame.sendMsg.html">sendMsg</a></li><li><a href="RoomOptions.copyLink.html">copyLink</a></li><li><a href="RoomOptions.displayHostMenu.html">displayHostMenu</a></li><li><a href="RoomOptions.exitRoom.html">exitRoom</a></li><li><a href="RoomOptions.importJson.html">importJson</a></li><li><a href="RoomOptions.isButtonClicked.html">isButtonClicked</a></li><li><a href="RoomOptions.kickPlayer.html">kickPlayer</a></li><li><a href="RoomOptions.resetPlayer.html">resetPlayer</a></li><li><a href="RoomOptions.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="RoomOptions.setGameMode.html">setGameMode</a></li><li><a href="RoomOptions.setHost.html">setHost</a></li><li><a href="RoomOptions.startGame.html">startGame</a></li><li><a href="RoomOptions.updRooms.html">updRooms</a></li><li><a href="Server.createRoom.html">createRoom</a></li><li><a href="Server.exitRoom.html">exitRoom</a></li><li><a href="Server.findRoomById.html">findRoomById</a></li><li><a href="Server.playerData.html">playerData</a></li><li><a href="Server.roomId.html">roomId</a></li><li><a href="Server.sendCard.html">sendCard</a></li><li><a href="Server.sendMsg.html">sendMsg</a></li><li><a href="Server.sendPlayer.html">sendPlayer</a></li><li><a href="Server.sendRoomOptions.html">sendRoomOptions</a></li><li><a href="Server.setHost.html">setHost</a></li><li><a href="Server.startGame.html">startGame</a></li></ul><h3>Events</h3><ul><li><a href="PokerGame.html#event:allCardsSent">allCardsSent</a></li><li><a href="PokerGame.html#event:endDebate">endDebate</a></li><li><a href="PokerGame.html#event:receiveMsg">receiveMsg</a></li><li><a href="PokerGame.html#event:receivePlayer">receivePlayer</a></li><li><a href="RoomOptions.html#event:endGame">endGame</a></li><li><a href="RoomOptions.html#event:joinRoom">joinRoom</a></li><li><a href="RoomOptions.html#event:kicked">kicked</a></li><li><a href="RoomOptions.html#event:listRooms">listRooms</a></li><li><a href="RoomOptions.html#event:newHost">newHost</a></li><li><a href="RoomOptions.html#event:receiveRoomOptions">receiveRoomOptions</a></li><li><a href="RoomOptions.html#event:startGame">startGame</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 18 2024 20:25:08 GMT+0100 (heure normale d’Europe centrale)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Dec 19 2024 11:40:47 GMT+0100 (heure normale d’Europe centrale)
 </footer>
 
 <script> prettyPrint(); </script>
